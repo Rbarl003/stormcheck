@@ -28,8 +28,8 @@
 
   // Official phone numbers (digits only)
   const OFFICIAL_PHONES = [
-    { digits: "8006213362", name: "FEMA's official helpline" },
-    { digits: "3054685900", name: "Miami-Dade 311" },
+    { digits: "8006213362", key: "fema-phone", name: "FEMA's official helpline" },
+    { digits: "3054685900", key: "md311", name: "Miami-Dade 311" },
   ];
 
   // Link shorteners hide where a link really goes
@@ -41,14 +41,14 @@
   // Words scammers put in fake website names to look official
   const BRAND_WORDS = [
     { word: "noaa", name: "NOAA" },
-    { word: "nhc", name: "the National Hurricane Center" },
+    { word: "nhc", name: "NHC" },
     { word: "fema", name: "FEMA" },
-    { word: "nws", name: "the National Weather Service" },
-    { word: "miamidade", name: "Miami-Dade County" },
-    { word: "miami-dade", name: "Miami-Dade County" },
-    { word: "floridadisaster", name: "Florida Emergency Management" },
-    { word: "redcross", name: "the Red Cross" },
-    { word: "disasterassistance", name: "FEMA's aid website" },
+    { word: "nws", name: "NWS" },
+    { word: "miamidade", name: "Miami-Dade" },
+    { word: "miami-dade", name: "Miami-Dade" },
+    { word: "floridadisaster", name: "FloridaDisaster" },
+    { word: "redcross", name: "Red Cross" },
+    { word: "disasterassistance", name: "DisasterAssistance" },
   ];
 
   // Real agencies people might claim to be
@@ -57,8 +57,8 @@
     { re: /\b(national weather service|nws)\b/i, name: "the National Weather Service", domain: "weather.gov" },
     { re: /\bfema\b/i, name: "FEMA", domain: "fema.gov" },
     { re: /\bnoaa\b/i, name: "NOAA", domain: "noaa.gov" },
-    { re: /\bmiami[-\s]?dade\s+(county\s+)?(emergency|government|office of emergency)/i, name: "Miami-Dade Emergency Management", domain: "miamidade.gov/hurricane" },
-    { re: /\bflorida division of emergency management\b/i, name: "Florida Emergency Management", domain: "floridadisaster.org" },
+    { re: /\bmiami[-\s]?dade\s+(county\s+)?(emergency|government|office of emergency)/i, name: "Miami-Dade Emergency Management", domain: "miamidade.gov/hurricane", key: "miamidade-em" },
+    { re: /\bflorida division of emergency management\b/i, name: "the Florida Division of Emergency Management", domain: "floridadisaster.org" },
   ];
 
   // Official alert types the National Weather Service issues
@@ -73,6 +73,44 @@
     "club live link click ru cn tk ml ga cf gq cc to gl in ca uk de fr es pw ws su icu shop store news " +
     "tv vip win work loan").split(" "));
 
+  // ---------- English text for every reason ----------
+  // Each reason has a key (like "payment") + details. The app can show it in
+  // Spanish or Haitian Creole using the same key (see i18n.js).
+  const upd = (p) => (p.time ? ` (updated ${p.time})` : "");
+  const EN = {
+    "personal-info": (p) => `It asks for private information ("${p.m}"). Real emergency alerts never ask for your Social Security number, bank details, or passwords.`,
+    "payment": (p) => `It asks you to pay ("${p.m}"). Government agencies never charge for alerts, shelters, or aid, and never ask for gift cards, Zelle, or crypto.`,
+    "conspiracy": (p) => `It claims officials are hiding the truth ("${p.m}"). This is a classic fake-news tactic. Real hurricane warnings are made public on purpose.`,
+    "free-money": (p) => `It promises money or special treatment ("${p.m}"). Real disaster aid is applied for at DisasterAssistance.gov. Nobody "wins" it from a text.`,
+    "pressure": (p) => `It pressures you to act fast ("${p.m}"). Scammers rush people so they don't stop to check.`,
+    "share-pressure": (p) => `It pushes you to spread it ("${p.m}"). Fake news depends on people forwarding it before checking.`,
+    "impossible-category": (p) => `It mentions "${p.m}". There is no such thing: hurricanes only go up to Category 5.`,
+    "impossible-wind": (p) => `It claims "${p.m}" winds. That's faster than any hurricane ever recorded, so it's almost certainly made up.`,
+    "shouting": () => "It's written in panic style (ALL CAPS or lots of !!!). Official alerts are calm and factual.",
+    "link-official": (p) => `Goes to ${p.host}, the real website of ${p.orgName}.`,
+    "link-ip": (p) => `Uses a bare number address (${p.host}) instead of a website name. Real agencies never do this. It hides who runs the site.`,
+    "link-shortener": (p) => `${p.host} is a link shortener. It hides the real website, so you can't see where it takes you. Official alerts link straight to .gov websites.`,
+    "link-punycode": () => "This address uses look-alike letters from other alphabets to imitate a real website.",
+    "link-lookalike": (p) => `Looks official but isn't. The real website is "${p.site}", which is not owned by the government. Scammers copy names like ${p.brand} to trick people.`,
+    "link-unknown": (p) => `Goes to ${p.host}, which is not an official emergency website, so it can't confirm this alert.`,
+    "download": () => "It asks you to download an app file from a link. Official alert apps only come from the App Store or Google Play.",
+    "unknown-phone": (p) => `It asks you to contact an unknown number (${p.phone}) about aid or money. Look up the number on an official website first. FEMA's real helpline is 1-800-621-3362.`,
+    "authority-mismatch": (p) => `It uses the name of ${p.orgName}, but doesn't send you to their real website (${p.domain}) or official phone line. Scammers often borrow real agency names.`,
+    "official-unknown-storm": (p) => `It talks about "${p.storm}", but official National Weather Service data${upd(p)} has no storm by that name affecting Miami-Dade. It may be fake or old.`,
+    "official-missing-event": (p) => `It mentions a ${p.event}, but official National Weather Service data${upd(p)} shows no active ${p.event} for Miami-Dade. It may be fake, old, or brand new. Check weather.gov/mfl.`,
+    "good-link": (p) => `It links to ${p.host}, the official website of ${p.orgName}.`,
+    "good-phone": (p) => `The phone number ${p.phone} is ${p.orgName}.`,
+    "good-match": (p) => `It matches an official alert active right now: "${p.event}" from ${p.sender}${upd(p)}.`,
+    "good-none": () => "No scam or fake-news warning signs were found.",
+    "hearsay": (p) => `It's based on someone's word ("${p.m}"), not an official source.`,
+    "claim-no-link": (p) => `It says it's from ${p.orgName}, but gives no official link to prove it. Check ${p.domain} directly.`,
+    "no-source": () => "There's no official source or link in this message, so it can't be confirmed.",
+    "official-but-flags": () => "It has an official link, but also some warning signs, so double-check it on the official website.",
+    "no-flags-rumor": () => "No scam warning signs were found. Treat it as a rumor until an official source confirms it.",
+  };
+  // Builds one reason: { key, p (details), text (English) }
+  function item(key, p) { p = p || {}; return { key, p, text: EN[key](p) }; }
+
   // ---------- 2. Red-flag rules ----------
   // severity: high (one is enough to be suspicious), medium, low
   const RULES = [
@@ -81,7 +119,6 @@
       patterns: [/social\s+security(\s+number)?/gi, /\bssn\b/gi, /date\s+of\s+birth/gi,
         /\bbank\s+(account|routing|login)\w*/gi, /\b(password|passcode|pin number)\b/gi,
         /credit\s+card(\s+number)?/gi, /seguro\s+social/gi, /fecha\s+de\s+nacimiento/gi, /cuenta\s+bancaria/gi],
-      reason: (m) => `It asks for private information ("${m}"). Real emergency alerts never ask for your Social Security number, bank details, or passwords.`,
     },
     {
       id: "payment", severity: "high", weight: 45,
@@ -89,21 +126,18 @@
         /\bwire\s+(money|transfer|funds)/gi, /\b(via|by)\s+wire\b/gi, /\b(pay|send)\s+(a\s+)?\$\s?\d[\d,]*/gi,
         /\bsend\s+(the\s+|us\s+|your\s+)?(funds|money|payment)\b/gi, /\b(application|processing|registration|release)\s+fee\b/gi,
         /tarjeta\s+de\s+regalo/gi, /\benv[ií]e\s+(el\s+)?dinero\b/gi],
-      reason: (m) => `It asks you to pay ("${m}"). Government agencies never charge for alerts, shelters, or aid, and never ask for gift cards, Zelle, or crypto.`,
     },
     {
       id: "conspiracy", severity: "high", weight: 40,
       patterns: [/\b(government|they|officials|media)\s+(is|are)\s+hiding\b/gi, /\bhiding\s+it\b/gi,
         /\b(they|media|officials)\s+(won'?t|will not|don'?t want to)\s+tell\s+you\b/gi,
         /\bdon'?t\s+want\s+you\s+to\s+know\b/gi, /\bcover[-\s]?up\b/gi],
-      reason: (m) => `It claims officials are hiding the truth ("${m}"). This is a classic fake-news tactic. Real hurricane warnings are made public on purpose.`,
     },
     {
       id: "free-money", severity: "medium", weight: 25,
       patterns: [/\byou\s+(qualify|are eligible|have been selected)\b/gi, /\bclaim\s+(your|it|now|the)\b/gi,
         /\b(relief|free)\s+(money|cash|payment|check)\b/gi, /\b(usted\s+)?califica\s+para\b/gi,
         /\bdinero\s+gratis\b/gi, /\bpriority\s+list\b/gi],
-      reason: (m) => `It promises money or special treatment ("${m}"). Real disaster aid is applied for at DisasterAssistance.gov. Nobody "wins" it from a text.`,
     },
     {
       id: "pressure", severity: "medium", weight: 20,
@@ -111,13 +145,11 @@
         /\blose\s+it\s+forever\b/gi, /\b(offer|deal)\s+ends\b/gi, /\blast\s+chance\b/gi,
         /\bact\s+(now|fast|immediately)\b/gi, /\blimited\s+(time|spots?)\b/gi, /\bspots?\s+are\s+limited\b/gi,
         /\b(haga\s+clic|click)\s+(aquí\s+|here\s+)?(ahora|now)/gi],
-      reason: (m) => `It pressures you to act fast ("${m}"). Scammers rush people so they don't stop to check.`,
     },
     {
       id: "share-pressure", severity: "medium", weight: 20,
       patterns: [/\bforward\s+this\b/gi, /\bshare\s+(this\s+)?with\s+everyone\b/gi, /\bshare\s+(this\s+)?now\b/gi,
         /\bcomparte\s+(esto|con\s+todos)\b/gi, /\breenv[ií]a\s+esto\b/gi],
-      reason: (m) => `It pushes you to spread it ("${m}"). Fake news depends on people forwarding it before checking.`,
     },
   ];
 
@@ -137,7 +169,7 @@
     for (const t of TRUSTED_DOMAINS) {
       if (host === t.domain || host.endsWith("." + t.domain)) return t;
     }
-    if (/\.(gov|mil)$/.test(host)) return { domain: host, name: "a U.S. government agency" };
+    if (/\.(gov|mil)$/.test(host)) return { domain: "gov", name: "a U.S. government agency" };
     return null;
   }
 
@@ -152,7 +184,7 @@
     const normal = host.replace(/0/g, "o").replace(/1/g, "l").replace(/3/g, "e").replace(/5/g, "s");
     for (const b of BRAND_WORDS) if (normal.includes(b.word)) return b.name;
     // "gov" hidden inside a non-government address, like fema-gov.com or gov.claims.net
-    if (/(^|[.-])gov([.-])/.test(host)) return "a government agency";
+    if (/(^|[.-])gov([.-])/.test(host)) return '"gov"';
     return null;
   }
 
@@ -183,27 +215,23 @@
     const trusted = matchTrusted(host);
 
     if (trusted && !dangerousFile) {
-      return { ...link, verdict: "official", explanation: `Goes to ${host}, the real website of ${trusted.name}.`, trustedName: trusted.name };
+      return { ...link, verdict: "official", org: trusted.domain, trustedName: trusted.name,
+        explain: item("link-official", { host, org: trusted.domain, orgName: trusted.name }) };
     }
     if (isIP) {
-      return { ...link, verdict: "danger", dangerousFile,
-        explanation: `Uses a bare number address (${host}) instead of a website name. Real agencies never do this. It hides who runs the site.` };
+      return { ...link, verdict: "danger", dangerousFile, explain: item("link-ip", { host }) };
     }
     if (SHORTENERS.has(host)) {
-      return { ...link, verdict: "warning",
-        explanation: `${host} is a link shortener. It hides the real website, so you can't see where it takes you. Official alerts link straight to .gov websites.` };
+      return { ...link, verdict: "warning", explain: item("link-shortener", { host }) };
     }
     if (host.startsWith("xn--") || host.includes(".xn--")) {
-      return { ...link, verdict: "danger",
-        explanation: `This address uses look-alike letters from other alphabets to imitate a real website.` };
+      return { ...link, verdict: "danger", explain: item("link-punycode") };
     }
     const brand = brandInHost(host);
     if (brand) {
-      return { ...link, verdict: "danger",
-        explanation: `Looks official but isn't. The real website is "${realSiteName(host)}", which is not owned by the government. Scammers copy names like ${brand} to trick people.` };
+      return { ...link, verdict: "danger", explain: item("link-lookalike", { site: realSiteName(host), brand }) };
     }
-    return { ...link, verdict: dangerousFile ? "danger" : "unknown", dangerousFile,
-      explanation: `Goes to ${host}, which is not an official emergency website, so it can't confirm this alert.` };
+    return { ...link, verdict: dangerousFile ? "danger" : "unknown", dangerousFile, explain: item("link-unknown", { host }) };
   }
 
   // ---------- 5. The main check ----------
@@ -219,7 +247,7 @@
       for (const p of rule.patterns) hits.push(...findAll(text, p));
       if (hits.length) {
         hits.sort((a, b) => a.start - b.start);
-        flags.push({ id: rule.id, severity: rule.severity, weight: rule.weight, reason: rule.reason(hits[0].text) });
+        flags.push({ id: rule.id, severity: rule.severity, weight: rule.weight, reason: item(rule.id, { m: hits[0].text }) });
         hits.forEach((h) => highlights.push({ ...h, severity: rule.severity }));
       }
     }
@@ -229,14 +257,14 @@
       .filter((h) => parseInt(h.text.match(/\d+/)[0], 10) > 5);
     if (badCat.length) {
       flags.push({ id: "impossible-category", severity: "high", weight: 45,
-        reason: `It mentions "${badCat[0].text}". There is no such thing: hurricanes only go up to Category 5.` });
+        reason: item("impossible-category", { m: badCat[0].text }) });
       badCat.forEach((h) => highlights.push({ ...h, severity: "high" }));
     }
     const badWind = findAll(text, /\b(\d{2,3})\s*(?:mph|miles per hour)\b/gi)
       .filter((h) => parseInt(h.text, 10) > 215);
     if (badWind.length) {
       flags.push({ id: "impossible-wind", severity: "high", weight: 40,
-        reason: `It claims "${badWind[0].text}" winds. That's faster than any hurricane ever recorded, so it's almost certainly made up.` });
+        reason: item("impossible-wind", { m: badWind[0].text }) });
       badWind.forEach((h) => highlights.push({ ...h, severity: "high" }));
     }
 
@@ -246,23 +274,23 @@
     const bangs = findAll(text, /!{2,}/g);
     if ((letters.length >= 25 && upper.length / letters.length > 0.6) || bangs.length) {
       flags.push({ id: "shouting", severity: "low", weight: 10,
-        reason: "It's written in panic style (ALL CAPS or lots of !!!). Official alerts are calm and factual." });
+        reason: item("shouting") });
       bangs.forEach((h) => highlights.push({ ...h, severity: "low" }));
     }
 
     // 5d. Links
-    const links = findLinks(text).map(xrayLink);
+    const links = findLinks(text).map(xrayLink).map((l) => ({ ...l, explanation: l.explain.text }));
     links.forEach((l) => {
       highlights.push({ start: l.start, end: l.end, text: l.raw, severity: l.verdict === "official" ? "good" : l.verdict === "unknown" ? "low" : l.verdict === "warning" ? "medium" : "high" });
     });
     const officialLinks = links.filter((l) => l.verdict === "official");
-    if (links.some((l) => l.isIP)) flags.push({ id: "ip-link", severity: "high", weight: 45, reason: links.find((l) => l.isIP).explanation });
+    if (links.some((l) => l.isIP)) flags.push({ id: "ip-link", severity: "high", weight: 45, reason: links.find((l) => l.isIP).explain });
     if (links.some((l) => l.dangerousFile)) flags.push({ id: "download", severity: "high", weight: 45,
-      reason: "It asks you to download an app file from a link. Official alert apps only come from the App Store or Google Play." });
+      reason: item("download") });
     const fake = links.find((l) => l.verdict === "danger" && !l.isIP && !l.dangerousFile);
-    if (fake) flags.push({ id: "lookalike-link", severity: "high", weight: 50, reason: fake.explanation });
+    if (fake) flags.push({ id: "lookalike-link", severity: "high", weight: 50, reason: fake.explain });
     const short = links.find((l) => l.verdict === "warning");
-    if (short) flags.push({ id: "shortener", severity: "medium", weight: 30, reason: short.explanation });
+    if (short) flags.push({ id: "shortener", severity: "medium", weight: 30, reason: short.explain });
 
     // 5e. Phone numbers: official or unknown?
     const phones = findAll(text, /(?:\+?1[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}\b/g)
@@ -274,7 +302,7 @@
     const aidWords = /\b(aid|relief|money|funds|fee|shelter|claim|assistance|grant|payment|refund|ayuda|dinero|reserve)\b/i;
     if (unknownPhone && aidWords.test(text)) {
       flags.push({ id: "unknown-phone", severity: "medium", weight: 20,
-        reason: `It asks you to contact an unknown number (${unknownPhone.text}) about aid or money. Look up the number on an official website first. FEMA's real helpline is 1-800-621-3362.` });
+        reason: item("unknown-phone", { phone: unknownPhone.text }) });
       highlights.push({ ...unknownPhone, severity: "medium" });
     }
 
@@ -284,7 +312,7 @@
     if (claimed.length && pointsElsewhere) {
       const a = claimed[0];
       flags.push({ id: "authority-mismatch", severity: "medium", weight: 20,
-        reason: `It uses the name of ${a.name}, but doesn't send you to their real website (${a.domain}) or official phone line. Scammers often borrow real agency names.` });
+        reason: item("authority-mismatch", { org: a.key || a.domain, orgName: a.name, domain: a.domain }) });
     }
 
     // 5g. Rumor wording (not dangerous, but not a source either)
@@ -294,7 +322,7 @@
     let officialMatch = null;
     if (Array.isArray(context.officialAlerts)) {
       const official = context.officialAlerts;
-      const when = context.updatedText ? ` (updated ${context.updatedText})` : "";
+      const time = context.updatedText || "";
       const officialEvents = official.map((a) => (a.event || "").toLowerCase());
       const officialText = official.map((a) => [a.event, a.headline, a.description, a.storm].join(" ")).join(" ").toLowerCase();
 
@@ -311,14 +339,14 @@
 
       if (unknownStorm) {
         flags.push({ id: "official-mismatch", severity: "medium", weight: 20,
-          reason: `It talks about "${unknownStorm.text}", but official National Weather Service data${when} has no storm by that name affecting Miami-Dade. It may be fake or old.` });
+          reason: item("official-unknown-storm", { storm: unknownStorm.text, time }) });
         highlights.push({ ...unknownStorm, severity: "medium" });
       } else if (matched) {
         officialMatch = official.find((a) => (a.event || "").toLowerCase() === matched);
       } else if (missing.length) {
         const ev = missing[0].replace(/\b\w/g, (c) => c.toUpperCase());
         flags.push({ id: "official-mismatch", severity: "medium", weight: 20,
-          reason: `It mentions a ${ev}, but official National Weather Service data${when} shows no active ${ev} for Miami-Dade. It may be fake, old, or brand new. Check weather.gov/mfl.` });
+          reason: item("official-missing-event", { event: ev, time }) });
       }
     }
 
@@ -333,28 +361,31 @@
     // ---------- 7. Plain-language reasons ----------
     const order = { high: 0, medium: 1, low: 2 };
     flags.sort((a, b) => order[a.severity] - order[b.severity]);
-    let reasons = [];
+    let items = [];
 
     if (label === "verified") {
-      if (officialLinks.length) goodNotes.push(`It links to ${officialLinks[0].host}, the official website of ${officialLinks[0].trustedName}.`);
-      if (officialPhone) goodNotes.push(`The phone number ${officialPhone.text} is ${officialPhone.match.name}.`);
-      if (officialMatch) goodNotes.push(`It matches an official alert active right now: "${officialMatch.event}" from ${officialMatch.senderName || "the National Weather Service"}${context.updatedText ? " (updated " + context.updatedText + ")" : ""}.`);
-      goodNotes.push("No scam or fake-news warning signs were found.");
-      reasons = goodNotes.concat(flags.map((f) => f.reason));
+      const l = officialLinks[0];
+      if (l) goodNotes.push(item("good-link", { host: l.host, org: l.org, orgName: l.trustedName }));
+      if (officialPhone) goodNotes.push(item("good-phone", { phone: officialPhone.text, org: officialPhone.match.key, orgName: officialPhone.match.name }));
+      if (officialMatch) goodNotes.push(item("good-match", { event: officialMatch.event, sender: officialMatch.senderName || "the National Weather Service", time: context.updatedText || "" }));
+      goodNotes.push(item("good-none"));
+      items = goodNotes.concat(flags.map((f) => f.reason));
     } else if (label === "suspicious") {
-      reasons = flags.map((f) => f.reason);
+      items = flags.map((f) => f.reason);
     } else {
-      reasons = flags.map((f) => f.reason);
-      if (hearsay) reasons.push(`It's based on someone's word ("${hearsay.text}"), not an official source.`);
+      items = flags.map((f) => f.reason);
+      if (hearsay) items.push(item("hearsay", { m: hearsay.text }));
       if (claimed.length && !links.length) {
-        reasons.push(`It says it's from ${claimed[0].name}, but gives no official link to prove it. Check ${claimed[0].domain} directly.`);
+        const a = claimed[0];
+        items.push(item("claim-no-link", { org: a.key || a.domain, orgName: a.name, domain: a.domain }));
       } else if (!hasOfficialSource) {
-        reasons.push("There's no official source or link in this message, so it can't be confirmed.");
+        items.push(item("no-source"));
       } else {
-        reasons.push("It has an official link, but also some warning signs, so double-check it on the official website.");
+        items.push(item("official-but-flags"));
       }
-      if (!flags.length) reasons.push("No scam warning signs were found. Treat it as a rumor until an official source confirms it.");
+      if (!flags.length) items.push(item("no-flags-rumor"));
     }
+    const reasons = items.map((i) => i.text);
 
     // ---------- 8. Trust score (0–100) ----------
     let score;
@@ -375,7 +406,8 @@
       title: titles[label],
       summary: summaries[label],
       score,
-      reasons,
+      reasons,   // English text
+      items,     // same reasons as { key, p } so the app can translate them
       flags,
       links,
       highlights: mergeHighlights(highlights),
@@ -399,7 +431,7 @@
     return out;
   }
 
-  const api = { analyze, TRUSTED_DOMAINS };
+  const api = { analyze, TRUSTED_DOMAINS, REASON_KEYS: Object.keys(EN) };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   else root.StormCheckEngine = api;
 })(typeof self !== "undefined" ? self : this);

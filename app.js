@@ -1,7 +1,7 @@
 // ============================================================
 // StormCheck — app.js
-// Sprint 0: page wiring + offline support.
-// The real checking rules get built in Sprint 1 (Saturday morning).
+// Connects the screen to the engine (engine.js), the official alerts
+// (official.js), and the languages (i18n.js).
 // ============================================================
 
 const input = document.getElementById("alert-input");
@@ -9,10 +9,50 @@ const checkBtn = document.getElementById("check-btn");
 const sampleBtn = document.getElementById("sample-btn");
 const resultBox = document.getElementById("result");
 const offlineBanner = document.getElementById("offline-banner");
+const officialStatus = document.getElementById("official-status");
+const officialList = document.getElementById("official-list");
+const refreshBtn = document.getElementById("refresh-btn");
+const demoToggle = document.getElementById("demo-toggle");
+const demoBadge = document.getElementById("demo-badge");
 
+let lang = I18N.getLang();        // "en", "es" or "ht"
 let sampleAlerts = [];
+let officialState = { alerts: null, fetchedAt: null, source: "none" };
+let last = null;                  // last checked { text, result }, so we can re-show it in another language
 
-// ---------- 1. Load sample alerts (used for testing + demo) ----------
+const t = (key) => I18N.ui(lang, key);
+
+// Small helper to build an element safely (textContent = no code injection)
+function el(tag, className, text) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+
+// ---------- 1. Language ----------
+function applyLanguage() {
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-i18n]").forEach((node) => { node.textContent = t(node.dataset.i18n); });
+  input.placeholder = t("placeholder");
+  document.querySelectorAll(".lang-switch button").forEach((b) => {
+    b.classList.toggle("active", b.dataset.lang === lang);
+    b.setAttribute("aria-pressed", b.dataset.lang === lang);
+  });
+  renderOfficial();
+  if (last && !resultBox.hidden) showResult(last.text, last.result, false);
+}
+
+document.querySelectorAll(".lang-switch button").forEach((b) => {
+  b.addEventListener("click", () => {
+    stopReading();
+    lang = b.dataset.lang;
+    I18N.setLang(lang);
+    applyLanguage();
+  });
+});
+
+// ---------- 2. Sample alerts (for testing + demo) ----------
 fetch("data/sample-alerts.json")
   .then((res) => res.json())
   .then((data) => { sampleAlerts = data; })
@@ -24,101 +64,44 @@ sampleBtn.addEventListener("click", () => {
   input.value = pick.text;
 });
 
-// ---------- 2. Check button ----------
+// ---------- 3. Check button ----------
 checkBtn.addEventListener("click", () => {
   const text = input.value.trim();
   if (!text) {
     input.focus();
-    input.placeholder = "Paste an alert or message here first.";
+    input.placeholder = t("placeholderEmpty");
     return;
   }
+  stopReading();
   // Give the engine the official alerts (live or saved) so it can compare
   const context = officialState.alerts
     ? { officialAlerts: officialState.alerts, updatedText: formatTime(officialState.fetchedAt) }
     : {};
   const result = StormCheckEngine.analyze(text, context); // the real engine (engine.js)
-  showResult(text, result);
+  last = { text, result };
+  showResult(text, result, true);
 });
 
-// ---------- 2b. Official alerts card ----------
-const officialStatus = document.getElementById("official-status");
-const officialList = document.getElementById("official-list");
-const refreshBtn = document.getElementById("refresh-btn");
-const demoToggle = document.getElementById("demo-toggle");
-const demoBadge = document.getElementById("demo-badge");
-let officialState = { alerts: null, fetchedAt: null, source: "none" };
-
-function formatTime(ts) {
-  if (!ts) return "";
-  const d = new Date(ts);
-  const time = d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
-  return d.toDateString() === new Date().toDateString() ? time : d.toLocaleDateString([], { month: "short", day: "numeric" }) + ", " + time;
-}
-
-async function refreshOfficial() {
-  officialStatus.textContent = "Checking official alerts…";
-  refreshBtn.disabled = true;
-  officialState = await Official.load();
-  refreshBtn.disabled = false;
-  renderOfficial();
-}
-
-function renderOfficial() {
-  const { alerts, fetchedAt, source } = officialState;
-  const when = formatTime(fetchedAt);
-  const statusText = {
-    live: `Live from the National Weather Service · updated ${when}`,
-    saved: `Offline: using saved official data from ${when}`,
-    demo: "Demo storm: fictional Hurricane Kendra (practice data, not real)",
-    none: "Not downloaded yet. Connect to the internet once to save official alerts on this phone.",
-  }[source];
-  officialStatus.textContent = statusText;
-  officialStatus.className = "official-status status-" + source;
-  demoBadge.hidden = source !== "demo";
-  demoToggle.checked = Official.isDemo();
-
-  officialList.innerHTML = "";
-  if (!alerts) return;
-  if (alerts.length === 0) {
-    officialList.append(el("li", "official-none", "✓ No active weather alerts for Miami-Dade right now."));
-    return;
-  }
-  alerts.forEach((a) => {
-    const li = el("li", "official-item");
-    li.append(el("strong", "", a.event), el("span", "", a.headline));
-    officialList.append(li);
-  });
-}
-
-refreshBtn.addEventListener("click", refreshOfficial);
-demoToggle.addEventListener("change", () => {
-  Official.setDemo(demoToggle.checked);
-  resultBox.hidden = true; // old result was based on other data
-  refreshOfficial();
-});
-window.addEventListener("online", refreshOfficial);
-refreshOfficial();
-
-// ---------- 3. Show a result on screen ----------
-// Small helper to build an element safely (textContent = no code injection)
-function el(tag, className, text) {
-  const node = document.createElement(tag);
-  if (className) node.className = className;
-  if (text !== undefined) node.textContent = text;
-  return node;
-}
-
-function showResult(text, r) {
+// ---------- 4. Show a result on screen ----------
+function showResult(text, r, scroll) {
   resultBox.className = "card result " + r.label;
   resultBox.innerHTML = "";
 
-  // Label + summary
-  resultBox.append(el("p", "result-label", r.title), el("p", "result-summary", r.summary));
+  // Label + summary + read aloud
+  const top = el("div", "result-top");
+  top.append(el("p", "result-label", t("titles")[r.label]));
+  if ("speechSynthesis" in window) {
+    const speakBtn = el("button", "btn-speak", t("readAloud"));
+    speakBtn.id = "speak-btn";
+    speakBtn.addEventListener("click", () => toggleReading(r));
+    top.append(speakBtn);
+  }
+  resultBox.append(top, el("p", "result-summary", t("summaries")[r.label]));
 
   // Trust score meter
   const meter = el("div", "meter");
   const meterTop = el("div", "meter-top");
-  meterTop.append(el("span", "", "Trust score"), el("strong", "", r.score + " / 100"));
+  meterTop.append(el("span", "", t("trust")), el("strong", "", r.score + " / 100"));
   const track = el("div", "meter-track");
   const fill = el("div", "meter-fill");
   fill.style.width = r.score + "%";
@@ -126,34 +109,35 @@ function showResult(text, r) {
   meter.append(meterTop, track);
   resultBox.append(meter);
 
-  // Reasons
-  resultBox.append(el("h3", "section-title", "Why?"));
+  // Reasons (translated)
+  resultBox.append(el("h3", "section-title", t("why")));
   const list = el("ul", "reasons");
-  r.reasons.forEach((reason) => list.append(el("li", "", reason)));
+  r.items.forEach((it) => list.append(el("li", "", I18N.reason(lang, it))));
   resultBox.append(list);
 
   // The message with warning signs highlighted
   if (r.highlights.length) {
-    resultBox.append(el("h3", "section-title", "What we spotted in the message"));
+    resultBox.append(el("h3", "section-title", t("spotted")));
     resultBox.append(buildHighlightedText(text, r.highlights));
+    const [danger, warning, official] = t("legend");
     const legend = el("div", "legend");
-    legend.append(el("span", "mark-high", "danger"), el("span", "mark-medium", "warning"), el("span", "mark-good", "official"));
+    legend.append(el("span", "mark-high", danger), el("span", "mark-medium", warning), el("span", "mark-good", official));
     resultBox.append(legend);
   }
 
   // Link X-ray
   if (r.links.length) {
-    resultBox.append(el("h3", "section-title", "🔍 Link X-ray"));
+    resultBox.append(el("h3", "section-title", t("xray")));
     r.links.forEach((link) => {
       const row = el("div", "xray xray-" + link.verdict);
       const icon = { official: "✅", warning: "⚠️", danger: "🚫", unknown: "❔" }[link.verdict];
-      row.append(el("div", "xray-host", icon + " " + link.raw), el("div", "xray-why", link.explanation));
+      row.append(el("div", "xray-host", icon + " " + link.raw), el("div", "xray-why", I18N.reason(lang, link.explain)));
       resultBox.append(row);
     });
   }
 
   resultBox.hidden = false;
-  resultBox.scrollIntoView({ behavior: "smooth", block: "start" });
+  if (scroll) resultBox.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 // Rebuilds the pasted message with colored highlights around the flagged parts
@@ -169,15 +153,113 @@ function buildHighlightedText(text, highlights) {
   return box;
 }
 
-// ---------- 4. Offline banner ----------
+// ---------- 5. Read aloud (built into the browser, works offline) ----------
+let reading = false;
+
+function pickVoice() {
+  const voices = window.speechSynthesis.getVoices();
+  for (const code of I18N.SPEECH[lang]) {
+    const v = voices.find((x) => x.lang.toLowerCase().replace("_", "-").startsWith(code.toLowerCase()));
+    if (v) return v;
+  }
+  return null;
+}
+
+function toggleReading(r) {
+  if (reading) { stopReading(); return; }
+  const parts = [t("titles")[r.label].replace(/^\S+\s/, ""), t("summaries")[r.label]]
+    .concat(r.items.map((it) => I18N.reason(lang, it)));
+  // Read links and quotes more naturally
+  const words = parts.join(". ").replace(/https?:\/\//g, "").replace(/["“”]/g, "");
+  const speech = new SpeechSynthesisUtterance(words);
+  const voice = pickVoice();
+  if (voice) { speech.voice = voice; speech.lang = voice.lang; } else { speech.lang = I18N.SPEECH[lang][0]; }
+  speech.rate = 0.95;
+  speech.onend = speech.onerror = () => setReading(false);
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(speech);
+  setReading(true);
+}
+
+function stopReading() {
+  if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+  setReading(false);
+}
+
+function setReading(on) {
+  reading = on;
+  const btn = document.getElementById("speak-btn");
+  if (btn) btn.textContent = on ? t("stopReading") : t("readAloud");
+}
+
+// Some browsers load voices late
+if ("speechSynthesis" in window) window.speechSynthesis.onvoiceschanged = () => {};
+
+// ---------- 6. Official alerts card ----------
+function formatTime(ts) {
+  if (!ts) return "";
+  const d = new Date(ts);
+  const time = d.toLocaleTimeString(lang, { hour: "numeric", minute: "2-digit" });
+  return d.toDateString() === new Date().toDateString() ? time : d.toLocaleDateString(lang, { month: "short", day: "numeric" }) + ", " + time;
+}
+
+async function refreshOfficial() {
+  officialStatus.textContent = t("checking");
+  refreshBtn.disabled = true;
+  officialState = await Official.load();
+  refreshBtn.disabled = false;
+  renderOfficial();
+}
+
+function renderOfficial() {
+  const { alerts, fetchedAt, source } = officialState;
+  const when = formatTime(fetchedAt);
+  const statusText = {
+    live: t("statusLive")(when),
+    saved: t("statusSaved")(when),
+    demo: t("statusDemo"),
+    none: t("statusNone"),
+  }[source];
+  officialStatus.textContent = statusText;
+  officialStatus.className = "official-status status-" + source;
+  demoBadge.hidden = source !== "demo";
+  demoToggle.checked = Official.isDemo();
+
+  officialList.innerHTML = "";
+  if (!alerts) return;
+  if (alerts.length === 0) {
+    officialList.append(el("li", "official-none", t("noAlerts")));
+    return;
+  }
+  alerts.forEach((a) => {
+    const li = el("li", "official-item");
+    li.append(el("strong", "", I18N.event(lang, a.event)), el("span", "", a.headline));
+    officialList.append(li);
+  });
+}
+
+refreshBtn.addEventListener("click", refreshOfficial);
+demoToggle.addEventListener("change", () => {
+  Official.setDemo(demoToggle.checked);
+  resultBox.hidden = true; // old result was based on other data
+  stopReading();
+  refreshOfficial();
+});
+window.addEventListener("online", refreshOfficial);
+
+// ---------- 7. Offline banner ----------
 function updateOnlineStatus() {
   offlineBanner.hidden = navigator.onLine;
 }
 window.addEventListener("online", updateOnlineStatus);
 window.addEventListener("offline", updateOnlineStatus);
-updateOnlineStatus();
 
-// ---------- 5. Service worker (makes the app work offline) ----------
+// ---------- 8. Start ----------
+applyLanguage();
+updateOnlineStatus();
+refreshOfficial();
+
+// ---------- 9. Service worker (makes the app work offline) ----------
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("sw.js")

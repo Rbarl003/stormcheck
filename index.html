@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>StormCheck</title>
-  <meta name="description" content="Check if a hurricane alert is real, suspicious, or unverified. Works offline.">
+  <meta name="description" content="Check if a hurricane alert is real, suspicious, or unverified. Works offline. English, Español, Kreyòl.">
 
   <!-- PWA: makes it installable like an app -->
   <link rel="manifest" href="manifest.json">
@@ -18,50 +18,57 @@
 </head>
 <body>
   <!-- Shows only when there is no internet -->
-  <div id="offline-banner" class="offline-banner" hidden>
+  <div id="offline-banner" class="offline-banner" data-i18n="offline" hidden>
     You're offline. StormCheck still works using saved data.
   </div>
 
   <header class="app-header">
     <div class="logo">🌀</div>
-    <div>
+    <div class="header-text">
       <h1>StormCheck <span id="demo-badge" class="demo-badge" hidden>DEMO</span></h1>
-      <p class="tagline">Is this hurricane alert real?</p>
+      <p class="tagline" data-i18n="tagline">Is this hurricane alert real?</p>
+    </div>
+    <!-- Language switch -->
+    <div class="lang-switch" role="group" aria-label="Language">
+      <button data-lang="en" lang="en">EN</button>
+      <button data-lang="es" lang="es">ES</button>
+      <button data-lang="ht" lang="ht">KR</button>
     </div>
   </header>
 
   <main class="container">
     <section class="card">
-      <label for="alert-input" class="label">Paste an alert, text message, or link</label>
+      <label for="alert-input" class="label" data-i18n="inputLabel">Paste an alert, text message, or link</label>
       <textarea id="alert-input" rows="6"
         placeholder="Example: URGENT! Hurricane Category 6 hitting Miami tonight. Click bit.ly/fema-pay to claim your relief money now!"></textarea>
-      <button id="check-btn" class="btn-primary">Check this alert</button>
-      <button id="sample-btn" class="btn-link">Try a sample alert</button>
+      <button id="check-btn" class="btn-primary" data-i18n="check">Check this alert</button>
+      <button id="sample-btn" class="btn-link" data-i18n="sample">Try a sample alert</button>
     </section>
 
     <!-- Result appears here after checking -->
-    <section id="result" class="card result" hidden></section>
+    <section id="result" class="card result" hidden aria-live="polite"></section>
 
     <!-- Official alerts from the National Weather Service (saved for offline use) -->
     <section class="card official">
       <div class="official-head">
-        <h2>📡 Official alerts · Miami-Dade</h2>
+        <h2 data-i18n="officialTitle">📡 Official alerts · Miami-Dade</h2>
         <button id="refresh-btn" class="btn-small" aria-label="Refresh official alerts">↻</button>
       </div>
       <p id="official-status" class="official-status">Loading official alerts…</p>
       <ul id="official-list" class="official-list"></ul>
       <label class="demo-toggle">
         <input type="checkbox" id="demo-toggle">
-        Demo storm mode (practice data for presentations)
+        <span data-i18n="demoToggle">Demo storm mode (practice data for presentations)</span>
       </label>
     </section>
   </main>
 
   <footer class="app-footer">
-    <span id="status-text">🔒 Checks run on your phone. Nothing you paste is sent anywhere.</span>
+    <span data-i18n="footer">🔒 Checks run on your phone. Nothing you paste is sent anywhere.</span>
   </footer>
 
   <script src="engine.js"></script>
+  <script src="i18n.js"></script>
   <script src="official.js"></script>
   <script src="app.js"></script>
 </body>
