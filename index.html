@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>StormCheck</title>
+  <meta name="description" content="Check if a hurricane alert is real, suspicious, or unverified. Works offline.">
+
+  <!-- PWA: makes it installable like an app -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0b1f3a">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="StormCheck">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Shows only when there is no internet -->
+  <div id="offline-banner" class="offline-banner" hidden>
+    You're offline. StormCheck still works using saved data.
+  </div>
+
+  <header class="app-header">
+    <div class="logo">🌀</div>
+    <div>
+      <h1>StormCheck</h1>
+      <p class="tagline">Is this hurricane alert real?</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <label for="alert-input" class="label">Paste an alert, text message, or link</label>
+      <textarea id="alert-input" rows="6"
+        placeholder="Example: URGENT! Hurricane Category 6 hitting Miami tonight. Click bit.ly/fema-pay to claim your relief money now!"></textarea>
+      <button id="check-btn" class="btn-primary">Check this alert</button>
+      <button id="sample-btn" class="btn-link">Try a sample alert</button>
+    </section>
+
+    <!-- Result appears here after checking -->
+    <section id="result" class="card result" hidden></section>
+  </main>
+
+  <footer class="app-footer">
+    <span id="status-text">Starter version — Sprint 0</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

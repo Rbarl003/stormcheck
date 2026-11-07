@@ -1,0 +1,110 @@
+[
+  {
+    "id": 1,
+    "expected": "verified",
+    "source": "National Hurricane Center style advisory",
+    "text": "Hurricane Kendra Advisory Number 14. National Weather Service / National Hurricane Center Miami FL. A Hurricane Warning is in effect for Miami-Dade County. Maximum sustained winds near 105 mph. Kendra is a Category 2 hurricane. Details at https://www.nhc.noaa.gov"
+  },
+  {
+    "id": 2,
+    "expected": "verified",
+    "source": "Miami-Dade County style evacuation notice",
+    "text": "Miami-Dade County Emergency Management: Mandatory evacuation ordered for Zones A and B effective 10 AM Saturday. Find your zone and open shelters at https://www.miamidade.gov/hurricane"
+  },
+  {
+    "id": 3,
+    "expected": "verified",
+    "source": "National Weather Service style warning",
+    "text": "NWS Miami: Storm Surge Warning in effect for coastal Miami-Dade. 4 to 7 feet of surge possible. Follow official instructions. More info: https://www.weather.gov/mfl"
+  },
+  {
+    "id": 4,
+    "expected": "verified",
+    "source": "FEMA style assistance info",
+    "text": "FEMA: Disaster assistance applications are free. Apply only at https://www.disasterassistance.gov or call 1-800-621-3362. FEMA will never ask you for money."
+  },
+  {
+    "id": 5,
+    "expected": "suspicious",
+    "source": "Scam text — fake relief money",
+    "text": "URGENT FEMA ALERT!!! You qualify for $1,500 hurricane relief. Claim in the next 10 minutes at bit.ly/fema-pay or lose it forever!"
+  },
+  {
+    "id": 6,
+    "expected": "suspicious",
+    "source": "Fake category",
+    "text": "BREAKING: Category 6 super hurricane will hit Miami tonight with 250 mph winds. The government is hiding it. Share with everyone NOW!!!"
+  },
+  {
+    "id": 7,
+    "expected": "suspicious",
+    "source": "Look-alike website",
+    "text": "National Hurricane Center: Evacuation required for all of Miami. Register your address at https://nhc-noaa-alerts.com to get a shelter spot."
+  },
+  {
+    "id": 8,
+    "expected": "suspicious",
+    "source": "Personal info request",
+    "text": "Miami-Dade Emergency: To receive your evacuation bus pass, reply with your full name, date of birth, and Social Security number."
+  },
+  {
+    "id": 9,
+    "expected": "suspicious",
+    "source": "Gift card scam",
+    "text": "Shelter spots are limited! Reserve your family's spot by sending a $100 Apple gift card code to this number."
+  },
+  {
+    "id": 10,
+    "expected": "suspicious",
+    "source": "Fake contractor / price pressure",
+    "text": "Hurricane damage? Pay $500 deposit today by Zelle and we will put your roof on top of the FEMA priority list. Offer ends tonight."
+  },
+  {
+    "id": 11,
+    "expected": "suspicious",
+    "source": "Fake 'tap water' rumor",
+    "text": "FORWARD THIS: Officials say all tap water in Miami is poisoned after the storm. Do not drink it. They won't tell you on TV."
+  },
+  {
+    "id": 12,
+    "expected": "suspicious",
+    "source": "Phishing link",
+    "text": "WEATHER ALERT: Your area is under a hurricane warning. Download the official alert app here: http://192.168.4.7/stormapp.apk"
+  },
+  {
+    "id": 13,
+    "expected": "unverified",
+    "source": "Neighbor rumor, no source",
+    "text": "My cousin said the Publix on 8th Street is closing early tomorrow because of the storm."
+  },
+  {
+    "id": 14,
+    "expected": "unverified",
+    "source": "Social post, no link",
+    "text": "Heard the storm might turn north and miss us. Fingers crossed!"
+  },
+  {
+    "id": 15,
+    "expected": "unverified",
+    "source": "Vague claim without source",
+    "text": "Schools in Miami-Dade will be closed Monday and Tuesday."
+  },
+  {
+    "id": 16,
+    "expected": "unverified",
+    "source": "Group chat forward",
+    "text": "Someone posted that I-95 northbound will become all lanes north for evacuation starting tonight."
+  },
+  {
+    "id": 17,
+    "expected": "suspicious",
+    "source": "Spanish scam text",
+    "text": "ALERTA FEMA: Usted califica para $2,000 de ayuda por el huracán. Haga clic aquí ahora: tinyurl.com/ayuda-fema"
+  },
+  {
+    "id": 18,
+    "expected": "verified",
+    "source": "Florida Division of Emergency Management style info",
+    "text": "Florida Division of Emergency Management: State of Emergency declared for South Florida counties. Shelter and resource info at https://www.floridadisaster.org"
+  }
+]
