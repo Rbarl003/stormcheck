@@ -28,43 +28,82 @@ sampleBtn.addEventListener("click", () => {
 checkBtn.addEventListener("click", () => {
   const text = input.value.trim();
   if (!text) {
-    showResult("unverified", "Nothing to check yet", ["Paste an alert or message above first."]);
+    input.focus();
+    input.placeholder = "Paste an alert or message here first.";
     return;
   }
-
-  // PLACEHOLDER: Sprint 1 replaces this with the real rules engine.
-  const result = checkAlert(text);
-  showResult(result.label, result.title, result.reasons);
+  const result = StormCheckEngine.analyze(text); // the real engine (engine.js)
+  showResult(text, result);
 });
 
-// Temporary checker so the screen works tonight.
-function checkAlert(text) {
-  return {
-    label: "unverified",
-    title: "❔ Unverified",
-    reasons: ["The checking rules are coming in Sprint 1. This is a test result."],
-  };
+// ---------- 3. Show a result on screen ----------
+// Small helper to build an element safely (textContent = no code injection)
+function el(tag, className, text) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text !== undefined) node.textContent = text;
+  return node;
 }
 
-// ---------- 3. Show a result on screen ----------
-function showResult(label, title, reasons) {
-  resultBox.className = "card result " + label;
+function showResult(text, r) {
+  resultBox.className = "card result " + r.label;
   resultBox.innerHTML = "";
 
-  const heading = document.createElement("p");
-  heading.className = "result-label";
-  heading.textContent = title;
+  // Label + summary
+  resultBox.append(el("p", "result-label", r.title), el("p", "result-summary", r.summary));
 
-  const list = document.createElement("ul");
-  reasons.forEach((r) => {
-    const li = document.createElement("li");
-    li.textContent = r; // textContent keeps pasted text safe (no code injection)
-    list.appendChild(li);
-  });
+  // Trust score meter
+  const meter = el("div", "meter");
+  const meterTop = el("div", "meter-top");
+  meterTop.append(el("span", "", "Trust score"), el("strong", "", r.score + " / 100"));
+  const track = el("div", "meter-track");
+  const fill = el("div", "meter-fill");
+  fill.style.width = r.score + "%";
+  track.append(fill);
+  meter.append(meterTop, track);
+  resultBox.append(meter);
 
-  resultBox.append(heading, list);
+  // Reasons
+  resultBox.append(el("h3", "section-title", "Why?"));
+  const list = el("ul", "reasons");
+  r.reasons.forEach((reason) => list.append(el("li", "", reason)));
+  resultBox.append(list);
+
+  // The message with warning signs highlighted
+  if (r.highlights.length) {
+    resultBox.append(el("h3", "section-title", "What we spotted in the message"));
+    resultBox.append(buildHighlightedText(text, r.highlights));
+    const legend = el("div", "legend");
+    legend.append(el("span", "mark-high", "danger"), el("span", "mark-medium", "warning"), el("span", "mark-good", "official"));
+    resultBox.append(legend);
+  }
+
+  // Link X-ray
+  if (r.links.length) {
+    resultBox.append(el("h3", "section-title", "🔍 Link X-ray"));
+    r.links.forEach((link) => {
+      const row = el("div", "xray xray-" + link.verdict);
+      const icon = { official: "✅", warning: "⚠️", danger: "🚫", unknown: "❔" }[link.verdict];
+      row.append(el("div", "xray-host", icon + " " + link.raw), el("div", "xray-why", link.explanation));
+      resultBox.append(row);
+    });
+  }
+
   resultBox.hidden = false;
   resultBox.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+// Rebuilds the pasted message with colored highlights around the flagged parts
+function buildHighlightedText(text, highlights) {
+  const box = el("div", "highlighted");
+  let pos = 0;
+  highlights.forEach((h) => {
+    if (h.start > pos) box.append(document.createTextNode(text.slice(pos, h.start)));
+    box.append(el("mark", "mark-" + h.severity, text.slice(h.start, h.end)));
+    pos = h.end;
+  });
+  if (pos < text.length) box.append(document.createTextNode(text.slice(pos)));
+  return box;
 }
 
 // ---------- 4. Offline banner ----------

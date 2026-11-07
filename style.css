@@ -106,8 +106,46 @@ textarea:focus { outline: none; border-color: var(--navy-light); }
 .result.suspicious .result-label { color: var(--suspicious); }
 .result.unverified .result-label { color: var(--unverified); }
 
-.result ul { padding-left: 20px; margin: 0; }
-.result li { margin-bottom: 6px; }
+.result-summary { margin: 0 0 14px; font-weight: 600; }
+
+.section-title { font-size: 15px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); margin: 18px 0 8px; }
+
+.reasons { padding-left: 20px; margin: 0; }
+.reasons li { margin-bottom: 8px; }
+
+/* Trust score meter */
+.meter-top { display: flex; justify-content: space-between; font-size: 15px; margin-bottom: 6px; }
+.meter-track { height: 12px; background: #e6ebf2; border-radius: 99px; overflow: hidden; }
+.meter-fill { height: 100%; border-radius: 99px; background: var(--muted); transition: width 0.6s ease; }
+.result.verified .meter-fill   { background: var(--verified); }
+.result.suspicious .meter-fill { background: var(--suspicious); }
+.result.unverified .meter-fill { background: var(--unverified); }
+
+/* Highlighted message */
+.highlighted {
+  background: #f7f9fc;
+  border: 1px solid #e1e7ef;
+  border-radius: 10px;
+  padding: 12px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+mark { padding: 1px 3px; border-radius: 4px; color: inherit; }
+.mark-high   { background: #fadbd8; border-bottom: 2px solid var(--suspicious); }
+.mark-medium { background: #fdebd0; border-bottom: 2px solid var(--unverified); }
+.mark-low    { background: #fdf3dc; }
+.mark-good   { background: #d5f0e0; border-bottom: 2px solid var(--verified); }
+
+.legend { display: flex; gap: 8px; margin-top: 8px; font-size: 13px; }
+.legend span { padding: 2px 8px; border-radius: 4px; }
+
+/* Link X-ray */
+.xray { border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; border: 1px solid #e1e7ef; }
+.xray-host { font-weight: 700; font-family: ui-monospace, Menlo, monospace; font-size: 14px; word-break: break-all; }
+.xray-why { font-size: 15px; margin-top: 4px; }
+.xray-official { background: #eef9f2; border-color: #bfe5cf; }
+.xray-warning  { background: #fdf6ea; border-color: #f3d9a8; }
+.xray-danger   { background: #fdf0ee; border-color: #f2c4bd; }
 
 /* ===== Offline banner ===== */
 .offline-banner {
