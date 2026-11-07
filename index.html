@@ -25,7 +25,7 @@
   <header class="app-header">
     <div class="logo">🌀</div>
     <div>
-      <h1>StormCheck</h1>
+      <h1>StormCheck <span id="demo-badge" class="demo-badge" hidden>DEMO</span></h1>
       <p class="tagline">Is this hurricane alert real?</p>
     </div>
   </header>
@@ -41,6 +41,20 @@
 
     <!-- Result appears here after checking -->
     <section id="result" class="card result" hidden></section>
+
+    <!-- Official alerts from the National Weather Service (saved for offline use) -->
+    <section class="card official">
+      <div class="official-head">
+        <h2>📡 Official alerts · Miami-Dade</h2>
+        <button id="refresh-btn" class="btn-small" aria-label="Refresh official alerts">↻</button>
+      </div>
+      <p id="official-status" class="official-status">Loading official alerts…</p>
+      <ul id="official-list" class="official-list"></ul>
+      <label class="demo-toggle">
+        <input type="checkbox" id="demo-toggle">
+        Demo storm mode (practice data for presentations)
+      </label>
+    </section>
   </main>
 
   <footer class="app-footer">
@@ -48,6 +62,7 @@
   </footer>
 
   <script src="engine.js"></script>
+  <script src="official.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

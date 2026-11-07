@@ -147,6 +147,31 @@ mark { padding: 1px 3px; border-radius: 4px; color: inherit; }
 .xray-warning  { background: #fdf6ea; border-color: #f3d9a8; }
 .xray-danger   { background: #fdf0ee; border-color: #f2c4bd; }
 
+/* ===== Official alerts card ===== */
+.official-head { display: flex; justify-content: space-between; align-items: center; }
+.official h2 { font-size: 18px; margin: 0; }
+.btn-small {
+  font: inherit; font-size: 18px; width: 36px; height: 36px; border-radius: 50%;
+  border: 1px solid #d5dde8; background: #fff; color: var(--navy); cursor: pointer;
+}
+.btn-small:disabled { opacity: 0.4; }
+.official-status { font-size: 14px; color: var(--muted); margin: 6px 0 10px; }
+.status-saved { color: var(--unverified); font-weight: 600; }
+.status-demo  { color: #6b3fa0; font-weight: 600; }
+.official-list { list-style: none; padding: 0; margin: 0 0 12px; }
+.official-item {
+  display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; margin-bottom: 8px;
+  border-left: 4px solid var(--suspicious); background: #fdf6f5; border-radius: 8px; font-size: 15px;
+}
+.official-item span { font-size: 14px; color: var(--muted); }
+.official-none { padding: 10px 12px; background: #eef9f2; border-radius: 8px; color: var(--verified); font-weight: 600; }
+.demo-toggle { display: flex; gap: 8px; align-items: center; font-size: 14px; color: var(--muted); cursor: pointer; }
+.demo-toggle input { width: 18px; height: 18px; }
+.demo-badge {
+  font-size: 11px; vertical-align: middle; background: #6b3fa0; color: #fff;
+  padding: 2px 6px; border-radius: 4px; letter-spacing: 0.06em;
+}
+
 /* ===== Offline banner ===== */
 .offline-banner {
   background: var(--unverified);

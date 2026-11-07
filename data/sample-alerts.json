@@ -106,5 +106,23 @@
     "expected": "verified",
     "source": "Florida Division of Emergency Management style info",
     "text": "Florida Division of Emergency Management: State of Emergency declared for South Florida counties. Shelter and resource info at https://www.floridadisaster.org"
+  },
+  {
+    "id": 19,
+    "expected": "suspicious",
+    "source": "Wire transfer + unknown phone (from tracker)",
+    "text": "Shelter spots expire tonight, send funds via wire to 305-555-0199"
+  },
+  {
+    "id": 20,
+    "expected": "suspicious",
+    "source": "Fake FEMA phone number",
+    "text": "FEMA: Call 305-555-0199 now to claim your hurricane relief payment."
+  },
+  {
+    "id": 21,
+    "expected": "suspicious",
+    "source": "Fake processing fee",
+    "text": "Your disaster assistance is approved. A $35 processing fee is required to release the funds. Reply YES."
   }
 ]

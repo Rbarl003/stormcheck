@@ -32,9 +32,72 @@ checkBtn.addEventListener("click", () => {
     input.placeholder = "Paste an alert or message here first.";
     return;
   }
-  const result = StormCheckEngine.analyze(text); // the real engine (engine.js)
+  // Give the engine the official alerts (live or saved) so it can compare
+  const context = officialState.alerts
+    ? { officialAlerts: officialState.alerts, updatedText: formatTime(officialState.fetchedAt) }
+    : {};
+  const result = StormCheckEngine.analyze(text, context); // the real engine (engine.js)
   showResult(text, result);
 });
+
+// ---------- 2b. Official alerts card ----------
+const officialStatus = document.getElementById("official-status");
+const officialList = document.getElementById("official-list");
+const refreshBtn = document.getElementById("refresh-btn");
+const demoToggle = document.getElementById("demo-toggle");
+const demoBadge = document.getElementById("demo-badge");
+let officialState = { alerts: null, fetchedAt: null, source: "none" };
+
+function formatTime(ts) {
+  if (!ts) return "";
+  const d = new Date(ts);
+  const time = d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  return d.toDateString() === new Date().toDateString() ? time : d.toLocaleDateString([], { month: "short", day: "numeric" }) + ", " + time;
+}
+
+async function refreshOfficial() {
+  officialStatus.textContent = "Checking official alerts…";
+  refreshBtn.disabled = true;
+  officialState = await Official.load();
+  refreshBtn.disabled = false;
+  renderOfficial();
+}
+
+function renderOfficial() {
+  const { alerts, fetchedAt, source } = officialState;
+  const when = formatTime(fetchedAt);
+  const statusText = {
+    live: `Live from the National Weather Service · updated ${when}`,
+    saved: `Offline: using saved official data from ${when}`,
+    demo: "Demo storm: fictional Hurricane Kendra (practice data, not real)",
+    none: "Not downloaded yet. Connect to the internet once to save official alerts on this phone.",
+  }[source];
+  officialStatus.textContent = statusText;
+  officialStatus.className = "official-status status-" + source;
+  demoBadge.hidden = source !== "demo";
+  demoToggle.checked = Official.isDemo();
+
+  officialList.innerHTML = "";
+  if (!alerts) return;
+  if (alerts.length === 0) {
+    officialList.append(el("li", "official-none", "✓ No active weather alerts for Miami-Dade right now."));
+    return;
+  }
+  alerts.forEach((a) => {
+    const li = el("li", "official-item");
+    li.append(el("strong", "", a.event), el("span", "", a.headline));
+    officialList.append(li);
+  });
+}
+
+refreshBtn.addEventListener("click", refreshOfficial);
+demoToggle.addEventListener("change", () => {
+  Official.setDemo(demoToggle.checked);
+  resultBox.hidden = true; // old result was based on other data
+  refreshOfficial();
+});
+window.addEventListener("online", refreshOfficial);
+refreshOfficial();
 
 // ---------- 3. Show a result on screen ----------
 // Small helper to build an element safely (textContent = no code injection)

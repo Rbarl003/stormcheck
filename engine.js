@@ -61,6 +61,13 @@
     { re: /\bflorida division of emergency management\b/i, name: "Florida Emergency Management", domain: "floridadisaster.org" },
   ];
 
+  // Official alert types the National Weather Service issues
+  const EVENT_TYPES = ["hurricane warning", "hurricane watch", "tropical storm warning", "tropical storm watch",
+    "storm surge warning", "storm surge watch", "flood warning", "flood watch", "flash flood warning", "tornado warning", "tornado watch"];
+  // Words after "Hurricane ..." that are not storm names
+  const NOT_NAMES = new Set(["warning", "watch", "season", "center", "advisory", "relief", "damage", "shelter", "shelters",
+    "update", "alert", "categoria", "category", "prep", "preparedness", "kit", "supplies", "evacuation", "force", "hunter", "hunters", "local", "statement"]);
+
   // Endings we accept as website names when there's no "http" or "www"
   const KNOWN_TLDS = new Set(("com net org gov edu mil us io co info biz ly me app xyz site online top " +
     "club live link click ru cn tk ml ga cf gq cc to gl in ca uk de fr es pw ws su icu shop store news " +
@@ -79,7 +86,9 @@
     {
       id: "payment", severity: "high", weight: 45,
       patterns: [/gift\s*card/gi, /\b(zelle|venmo|cash\s?app|western union|moneygram|bitcoin|crypto(currency)?)\b/gi,
-        /\bwire\s+(money|transfer|funds)/gi, /\b(pay|send)\s+(a\s+)?\$\s?\d[\d,]*/gi, /tarjeta\s+de\s+regalo/gi],
+        /\bwire\s+(money|transfer|funds)/gi, /\b(via|by)\s+wire\b/gi, /\b(pay|send)\s+(a\s+)?\$\s?\d[\d,]*/gi,
+        /\bsend\s+(the\s+|us\s+|your\s+)?(funds|money|payment)\b/gi, /\b(application|processing|registration|release)\s+fee\b/gi,
+        /tarjeta\s+de\s+regalo/gi, /\benv[ií]e\s+(el\s+)?dinero\b/gi],
       reason: (m) => `It asks you to pay ("${m}"). Government agencies never charge for alerts, shelters, or aid, and never ask for gift cards, Zelle, or crypto.`,
     },
     {
@@ -255,28 +264,67 @@
     const short = links.find((l) => l.verdict === "warning");
     if (short) flags.push({ id: "shortener", severity: "medium", weight: 30, reason: short.explanation });
 
-    // 5e. Does it claim to be from a real agency?
-    const claimed = AGENCIES.filter((a) => a.re.test(text));
-    if (claimed.length && links.length && !officialLinks.length) {
-      const a = claimed[0];
-      flags.push({ id: "authority-mismatch", severity: "medium", weight: 20,
-        reason: `It uses the name of ${a.name}, but the link doesn't go to the real website (${a.domain}). Scammers often borrow real agency names.` });
+    // 5e. Phone numbers: official or unknown?
+    const phones = findAll(text, /(?:\+?1[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}\b/g)
+      .map((p) => ({ ...p, digits: p.text.replace(/\D/g, "").replace(/^1(?=\d{10}$)/, "") }))
+      .map((p) => ({ ...p, match: OFFICIAL_PHONES.find((o) => o.digits === p.digits) }));
+    const officialPhone = phones.find((p) => p.match);
+    if (officialPhone) highlights.push({ ...officialPhone, severity: "good" });
+    const unknownPhone = phones.find((p) => !p.match);
+    const aidWords = /\b(aid|relief|money|funds|fee|shelter|claim|assistance|grant|payment|refund|ayuda|dinero|reserve)\b/i;
+    if (unknownPhone && aidWords.test(text)) {
+      flags.push({ id: "unknown-phone", severity: "medium", weight: 20,
+        reason: `It asks you to contact an unknown number (${unknownPhone.text}) about aid or money. Look up the number on an official website first. FEMA's real helpline is 1-800-621-3362.` });
+      highlights.push({ ...unknownPhone, severity: "medium" });
     }
 
-    // 5f. Official phone numbers
-    const phones = findAll(text, /(?:\+?1[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}\b/g);
-    const officialPhone = phones
-      .map((p) => ({ ...p, digits: p.text.replace(/\D/g, "").replace(/^1(?=\d{10}$)/, "") }))
-      .map((p) => ({ ...p, match: OFFICIAL_PHONES.find((o) => o.digits === p.digits) }))
-      .find((p) => p.match);
-    if (officialPhone) highlights.push({ ...officialPhone, severity: "good" });
+    // 5f. Does it claim to be from a real agency, but point you somewhere else?
+    const claimed = AGENCIES.filter((a) => a.re.test(text));
+    const pointsElsewhere = (links.length && !officialLinks.length) || (unknownPhone && !officialPhone && !officialLinks.length);
+    if (claimed.length && pointsElsewhere) {
+      const a = claimed[0];
+      flags.push({ id: "authority-mismatch", severity: "medium", weight: 20,
+        reason: `It uses the name of ${a.name}, but doesn't send you to their real website (${a.domain}) or official phone line. Scammers often borrow real agency names.` });
+    }
 
     // 5g. Rumor wording (not dangerous, but not a source either)
     const hearsay = findAll(text, /\b(my\s+(cousin|friend|neighbou?r|aunt|uncle|mom|dad|brother|sister|coworker)\s+(said|says|told)|someone\s+(posted|said)|i\s+heard|heard\s+(that|the)|people\s+are\s+saying|rumou?r|dicen\s+que|me\s+dijeron)\b/gi)[0];
 
+    // 5h. Compare with official NWS alerts saved on the phone (live or offline copy)
+    let officialMatch = null;
+    if (Array.isArray(context.officialAlerts)) {
+      const official = context.officialAlerts;
+      const when = context.updatedText ? ` (updated ${context.updatedText})` : "";
+      const officialEvents = official.map((a) => (a.event || "").toLowerCase());
+      const officialText = official.map((a) => [a.event, a.headline, a.description, a.storm].join(" ")).join(" ").toLowerCase();
+
+      // Which official alert types does the message talk about?
+      const claimedEvents = EVENT_TYPES.filter((ev) => new RegExp("\\b" + ev.replace(/ /g, "\\s+") + "\\b", "i").test(text));
+      const matched = claimedEvents.find((ev) => officialEvents.includes(ev));
+      const missing = claimedEvents.filter((ev) => !officialEvents.includes(ev));
+
+      // Does it name a storm that isn't in the official data?
+      const named = findAll(text, /\b(?:[Hh]urricane|[Tt]ropical [Ss]torm|[Hh]urac[aá]n|[Tt]ormenta [Tt]ropical)\s+([A-Z][a-z]{2,})\b/g)
+        .map((h) => ({ ...h, name: h.text.split(/\s+/).pop() }))
+        .filter((h) => !NOT_NAMES.has(h.name.toLowerCase()));
+      const unknownStorm = named.find((h) => !officialText.includes(h.name.toLowerCase()));
+
+      if (unknownStorm) {
+        flags.push({ id: "official-mismatch", severity: "medium", weight: 20,
+          reason: `It talks about "${unknownStorm.text}", but official National Weather Service data${when} has no storm by that name affecting Miami-Dade. It may be fake or old.` });
+        highlights.push({ ...unknownStorm, severity: "medium" });
+      } else if (matched) {
+        officialMatch = official.find((a) => (a.event || "").toLowerCase() === matched);
+      } else if (missing.length) {
+        const ev = missing[0].replace(/\b\w/g, (c) => c.toUpperCase());
+        flags.push({ id: "official-mismatch", severity: "medium", weight: 20,
+          reason: `It mentions a ${ev}, but official National Weather Service data${when} shows no active ${ev} for Miami-Dade. It may be fake, old, or brand new. Check weather.gov/mfl.` });
+      }
+    }
+
     // ---------- 6. Decide the label ----------
     const risk = flags.reduce((sum, f) => sum + f.weight, 0);
-    const hasOfficialSource = officialLinks.length > 0 || !!officialPhone;
+    const hasOfficialSource = officialLinks.length > 0 || !!officialPhone || !!officialMatch;
     let label;
     if (risk >= 40) label = "suspicious";
     else if (hasOfficialSource && risk < 20) label = "verified";
@@ -290,6 +338,7 @@
     if (label === "verified") {
       if (officialLinks.length) goodNotes.push(`It links to ${officialLinks[0].host}, the official website of ${officialLinks[0].trustedName}.`);
       if (officialPhone) goodNotes.push(`The phone number ${officialPhone.text} is ${officialPhone.match.name}.`);
+      if (officialMatch) goodNotes.push(`It matches an official alert active right now: "${officialMatch.event}" from ${officialMatch.senderName || "the National Weather Service"}${context.updatedText ? " (updated " + context.updatedText + ")" : ""}.`);
       goodNotes.push("No scam or fake-news warning signs were found.");
       reasons = goodNotes.concat(flags.map((f) => f.reason));
     } else if (label === "suspicious") {

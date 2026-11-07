@@ -5,16 +5,18 @@
 // so phones download the new version.
 // ============================================================
 
-const CACHE_NAME = "stormcheck-v2";
+const CACHE_NAME = "stormcheck-v3";
 
 const APP_FILES = [
   "./",
   "./index.html",
   "./style.css",
   "./engine.js",
+  "./official.js",
   "./app.js",
   "./manifest.json",
   "./data/sample-alerts.json",
+  "./data/demo-official-alerts.json",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
 ];
@@ -38,6 +40,8 @@ self.addEventListener("activate", (event) => {
 // Try the network first; if it fails (offline), use the saved copy
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
+  // Only handle the app's own files. Official NWS data is saved by official.js instead.
+  if (new URL(event.request.url).origin !== self.location.origin) return;
   event.respondWith(
     fetch(event.request)
       .then((response) => {

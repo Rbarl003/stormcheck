@@ -16,7 +16,7 @@
 </head>
 <body>
   <h1>StormCheck engine tests</h1>
-  <p>Runs every sample alert through the engine and compares it to the expected label.</p>
+  <p>Runs every sample alert through the engine and compares it to the expected label. Rows starting with C are also compared against official alert data.</p>
   <div id="summary">Running…</div>
   <table>
     <thead><tr><th>#</th><th>Result</th><th>Expected</th><th>Got</th><th>Score</th><th>Sample</th></tr></thead>
@@ -25,25 +25,34 @@
 
   <script src="../engine.js"></script>
   <script>
-    fetch("../data/sample-alerts.json").then((r) => r.json()).then((samples) => {
-      let passed = 0;
+    Promise.all([
+      fetch("../data/sample-alerts.json").then((r) => r.json()),
+      fetch("context-cases.json").then((r) => r.json()),
+      fetch("../data/demo-official-alerts.json").then((r) => r.json()),
+    ]).then(([samples, cases, demo]) => {
+      let passed = 0, total = 0;
       const rows = document.getElementById("rows");
-      samples.forEach((s) => {
-        const r = StormCheckEngine.analyze(s.text);
-        const ok = r.label === s.expected;
+      function addRow(id, expected, text, context, source) {
+        total++;
+        const r = StormCheckEngine.analyze(text, context);
+        const ok = r.label === expected;
         if (ok) passed++;
         const tr = document.createElement("tr");
-        [s.id, ok ? "PASS" : "FAIL", s.expected, r.label, r.score, s.source].forEach((v, i) => {
+        [id, ok ? "PASS" : "FAIL", expected, r.label, r.score, source].forEach((v, i) => {
           const td = document.createElement("td");
           td.textContent = v;
           if (i === 1) td.className = ok ? "pass" : "fail";
           tr.appendChild(td);
         });
         rows.appendChild(tr);
-      });
+      }
+      samples.forEach((s) => addRow(s.id, s.expected, s.text, {}, s.source));
+      cases.forEach((c) => addRow(c.id, c.expected, c.text,
+        { officialAlerts: c.data === "demo" ? demo.alerts : [], updatedText: "4:52 PM" },
+        c.source + " (compared with official data)"));
       const sum = document.getElementById("summary");
-      sum.textContent = `${passed} / ${samples.length} passed`;
-      sum.className = passed === samples.length ? "pass" : "fail";
+      sum.textContent = `${passed} / ${total} passed`;
+      sum.className = passed === total ? "pass" : "fail";
     });
   </script>
 </body>

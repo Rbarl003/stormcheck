@@ -1,0 +1,44 @@
+[
+  {
+    "id": "C1",
+    "data": "demo",
+    "expected": "verified",
+    "source": "No link, but matches an active official Hurricane Warning",
+    "text": "Hurricane Warning in effect for Miami-Dade County. Finish preparations now."
+  },
+  {
+    "id": "C2",
+    "data": "demo",
+    "expected": "unverified",
+    "source": "Names a storm that doesn't exist in official data",
+    "text": "Hurricane Brenda is expected to make landfall in Miami tomorrow morning."
+  },
+  {
+    "id": "C3",
+    "data": "demo",
+    "expected": "unverified",
+    "source": "Claims a warning that isn't active",
+    "text": "A Tornado Warning has been issued for all of Miami-Dade."
+  },
+  {
+    "id": "C4",
+    "data": "empty",
+    "expected": "unverified",
+    "source": "Real-looking link, but no storm active right now (old alert recirculating)",
+    "text": "Hurricane Kendra Advisory 14: Hurricane Warning in effect for Miami-Dade. https://www.nhc.noaa.gov"
+  },
+  {
+    "id": "C5",
+    "data": "demo",
+    "expected": "verified",
+    "source": "Official link + matches active storm",
+    "text": "Hurricane Kendra Advisory 14: Hurricane Warning in effect for Miami-Dade. https://www.nhc.noaa.gov"
+  },
+  {
+    "id": "C6",
+    "data": "demo",
+    "expected": "suspicious",
+    "source": "Mentions real storm but asks for money",
+    "text": "Hurricane Kendra relief: send $40 via Zelle to get on the shelter list."
+  }
+]

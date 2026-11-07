@@ -1,0 +1,29 @@
+{
+  "note": "PRACTICE DATA for demos only. Hurricane Kendra is fictional. Turn off Demo storm mode to use real National Weather Service alerts.",
+  "alerts": [
+    {
+      "event": "Hurricane Warning",
+      "headline": "Hurricane Warning issued for Miami-Dade County due to Hurricane Kendra (DEMO)",
+      "areaDesc": "Coastal Miami-Dade; Inland Miami-Dade",
+      "senderName": "NWS Miami FL",
+      "storm": "Kendra",
+      "description": "Hurricane Kendra, a Category 2 hurricane with maximum sustained winds near 105 mph, is expected to bring hurricane conditions to Miami-Dade County."
+    },
+    {
+      "event": "Storm Surge Warning",
+      "headline": "Storm Surge Warning issued for coastal Miami-Dade due to Hurricane Kendra (DEMO)",
+      "areaDesc": "Coastal Miami-Dade",
+      "senderName": "NWS Miami FL",
+      "storm": "Kendra",
+      "description": "Life-threatening storm surge of 4 to 7 feet above ground possible along the coast."
+    },
+    {
+      "event": "Flood Watch",
+      "headline": "Flood Watch for Miami-Dade County (DEMO)",
+      "areaDesc": "Coastal Miami-Dade; Inland Miami-Dade",
+      "senderName": "NWS Miami FL",
+      "storm": "Kendra",
+      "description": "Heavy rain from Hurricane Kendra may cause flooding in low-lying areas."
+    }
+  ]
+}
