@@ -241,3 +241,38 @@ mark { padding: 1px 3px; border-radius: 4px; color: inherit; }
   background: #eaf1fb; border: 1px solid #c6d7f0; color: var(--navy-light);
   border-radius: 10px; padding: 10px 12px; font-size: 15px; font-weight: 600; margin-bottom: 12px;
 }
+
+/* ===== Spot the Fake game ===== */
+.game-card p { margin: 0; font-weight: 600; }
+.game-card .btn-share { margin-top: 12px; }
+.game { position: relative; }
+.game-close {
+  position: absolute; top: 14px; right: 14px; width: 36px; height: 36px; border-radius: 50%;
+  border: 1px solid #d5dde8; background: #fff; font-size: 16px; cursor: pointer; color: var(--muted);
+}
+.game-emoji { font-size: 48px; text-align: center; margin: 8px 0 4px; }
+.game h2 { padding-right: 44px; }
+.game-progress { display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: var(--muted); margin: 4px 48px 14px 0; }
+.game-dots { display: flex; gap: 6px; }
+.game-dots i { width: 10px; height: 10px; border-radius: 50%; background: #d5dde8; }
+.game-dots i.done { background: var(--navy-light); }
+.game-dots i.now { background: var(--navy); box-shadow: 0 0 0 3px #c6d7f0; }
+.game-message {
+  background: #f7f9fc; border: 1px solid #e1e7ef; border-radius: 12px; padding: 14px;
+  font-size: 17px; margin: 10px 0 16px; white-space: pre-wrap; word-break: break-word;
+}
+.game-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.game-choices button {
+  font: inherit; font-size: 18px; font-weight: 800; padding: 16px 8px; border-radius: 12px; cursor: pointer; border: 2px solid;
+}
+.choice-real { background: #eef9f2; border-color: var(--verified) !important; color: var(--verified); }
+.choice-fake { background: #fdf0ee; border-color: var(--suspicious) !important; color: var(--suspicious); }
+.game-feedback { border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; }
+.game-feedback strong { font-size: 20px; }
+.game-feedback.right { background: #eef9f2; color: var(--verified); }
+.game-feedback.wrong { background: #fdf0ee; color: var(--suspicious); }
+.game-feedback span { color: var(--text); font-weight: 600; }
+.game .btn-primary { margin-top: 16px; }
+.game-bar { margin: 6px 0 14px; }
+.game-bar .meter-fill { background: var(--verified); }
+.game-tip { background: #fdf6ea; border-radius: 10px; padding: 10px 12px; font-size: 15px; }

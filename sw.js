@@ -5,7 +5,7 @@
 // so phones download the new version.
 // ============================================================
 
-const CACHE_NAME = "stormcheck-v5";
+const CACHE_NAME = "stormcheck-v6";
 
 const APP_FILES = [
   "./",
@@ -17,9 +17,11 @@ const APP_FILES = [
   "./share.js",
   "./vendor/qrcode.js",
   "./app.js",
+  "./game.js",
   "./manifest.json",
   "./data/sample-alerts.json",
   "./data/demo-official-alerts.json",
+  "./data/game-deck.json",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
 ];

@@ -27,6 +27,12 @@ cases.forEach((c) => {
   check(c.id, c.expected, c.text, { officialAlerts, updatedText: "4:52 PM" }, c.source);
 });
 
+console.log("\n— Spot the Fake game: engine agrees with every answer, in every language —");
+const deck = require(path.join(__dirname, "..", "data", "game-deck.json"));
+deck.forEach((g) => ["en", "es", "ht"].forEach((l) => {
+  check(g.id + l, g.answer === "real" ? "verified" : "suspicious", g.text[l], {}, `game ${g.answer} (${l})`);
+}));
+
 console.log("\n— QR share links —");
 const share = require(path.join(__dirname, "..", "share.js"));
 ["Hurricane Warning for Miami-Dade. https://www.nhc.noaa.gov", "ALERTA FEMA: ayuda por el huracán ñ", "Avètisman siklòn: lanmè k ap monte"].forEach((msg, i) => {

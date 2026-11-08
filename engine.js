@@ -118,38 +118,46 @@
       id: "personal-info", severity: "high", weight: 50,
       patterns: [/social\s+security(\s+number)?/gi, /\bssn\b/gi, /date\s+of\s+birth/gi,
         /\bbank\s+(account|routing|login)\w*/gi, /\b(password|passcode|pin number)\b/gi,
-        /credit\s+card(\s+number)?/gi, /seguro\s+social/gi, /fecha\s+de\s+nacimiento/gi, /cuenta\s+bancaria/gi],
+        /credit\s+card(\s+number)?/gi, /seguro\s+social/gi, /fecha\s+de\s+nacimiento/gi, /cuenta\s+bancaria/gi,
+        /sekirite\s+sosyal/gi, /dat\s+(de\s+)?nesans/gi, /kont\s+bank/gi, /modpas/gi],
     },
     {
       id: "payment", severity: "high", weight: 45,
       patterns: [/gift\s*card/gi, /\b(zelle|venmo|cash\s?app|western union|moneygram|bitcoin|crypto(currency)?)\b/gi,
         /\bwire\s+(money|transfer|funds)/gi, /\b(via|by)\s+wire\b/gi, /\b(pay|send)\s+(a\s+)?\$\s?\d[\d,]*/gi,
         /\bsend\s+(the\s+|us\s+|your\s+)?(funds|money|payment)\b/gi, /\b(application|processing|registration|release)\s+fee\b/gi,
-        /tarjeta\s+de\s+regalo/gi, /\benv[ií]e\s+(el\s+)?dinero\b/gi],
+        /tarjeta\s+de\s+regalo/gi, /\benv[ií]e\s+(el\s+)?dinero\b/gi,
+        /kat\s+kado/gi, /\bvoye\s+lajan\b/gi, /\bpeye\s+\$\s?\d[\d,]*/gi],
     },
     {
       id: "conspiracy", severity: "high", weight: 40,
       patterns: [/\b(government|they|officials|media)\s+(is|are)\s+hiding\b/gi, /\bhiding\s+it\b/gi,
         /\b(they|media|officials)\s+(won'?t|will not|don'?t want to)\s+tell\s+you\b/gi,
-        /\bdon'?t\s+want\s+you\s+to\s+know\b/gi, /\bcover[-\s]?up\b/gi],
+        /\bdon'?t\s+want\s+you\s+to\s+know\b/gi, /\bcover[-\s]?up\b/gi,
+        /\b(gobierno|autoridades)\s+(lo\s+)?(est[aá]n?\s+escondiendo|esconden?|ocultan?)/gi,
+        /\b(gouv[eè]nman|otorite)\s+(an\s+|yo\s+)?ap\s+kache\b/gi],
     },
     {
       id: "free-money", severity: "medium", weight: 25,
       patterns: [/\byou\s+(qualify|are eligible|have been selected)\b/gi, /\bclaim\s+(your|it|now|the)\b/gi,
         /\b(relief|free)\s+(money|cash|payment|check)\b/gi, /\b(usted\s+)?califica\s+para\b/gi,
-        /\bdinero\s+gratis\b/gi, /\bpriority\s+list\b/gi],
+        /\bdinero\s+gratis\b/gi, /\bpriority\s+list\b/gi,
+        /\bou\s+kalifye\b/gi, /\blajan\s+gratis\b/gi, /\btouche\s+(l|lajan)\b/gi, /\bc[oó]brelo\b/gi],
     },
     {
       id: "pressure", severity: "medium", weight: 20,
       patterns: [/\b(in|within)\s+(the\s+next\s+)?\d+\s+(minutes?|mins?)\b/gi, /\bor\s+lose\s+(it|your)\b/gi,
         /\blose\s+it\s+forever\b/gi, /\b(offer|deal)\s+ends\b/gi, /\blast\s+chance\b/gi,
         /\bact\s+(now|fast|immediately)\b/gi, /\blimited\s+(time|spots?)\b/gi, /\bspots?\s+are\s+limited\b/gi,
-        /\b(haga\s+clic|click)\s+(aquí\s+|here\s+)?(ahora|now)/gi],
+        /\b(haga\s+clic|click)\s+(aquí\s+|here\s+)?(ahora|now)/gi,
+        /\bpr[oó]ximos\s+\d+\s+minutos\b/gi, /\bo\s+lo\s+pierde\b/gi, /\blugares\s+(son\s+)?limitados\b/gi,
+        /\b\d+\s+minit\b/gi, /w\s+ap\s+p[eè]di\s+l/gi, /\bplas\s+(yo\s+)?limite\b/gi],
     },
     {
       id: "share-pressure", severity: "medium", weight: 20,
       patterns: [/\bforward\s+this\b/gi, /\bshare\s+(this\s+)?with\s+everyone\b/gi, /\bshare\s+(this\s+)?now\b/gi,
-        /\bcomparte\s+(esto|con\s+todos)\b/gi, /\breenv[ií]a\s+esto\b/gi],
+        /\bcomparte\s+(esto|con\s+todos)\b/gi, /\breenv[ií]a\s+esto\b/gi,
+        /\bpataje\s+(l\s+|li\s+)?(ak|av[eè]k)\s+tout\s+moun\b/gi],
     },
   ];
 
@@ -253,7 +261,7 @@
     }
 
     // 5b. Impossible storm facts
-    const badCat = findAll(text, /\b(?:category|cat\.?|categor[ií]a)\s*(\d{1,2})\b/gi)
+    const badCat = findAll(text, /\b(?:category|cat\.?|categor[ií]a|kategori)\s*(\d{1,2})\b/gi)
       .filter((h) => parseInt(h.text.match(/\d+/)[0], 10) > 5);
     if (badCat.length) {
       flags.push({ id: "impossible-category", severity: "high", weight: 45,

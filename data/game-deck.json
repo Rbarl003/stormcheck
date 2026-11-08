@@ -1,0 +1,119 @@
+[
+  {
+    "id": "g1", "answer": "real",
+    "text": {
+      "en": "NWS Miami: Hurricane Warning in effect for Miami-Dade. Finish your preparations today. Details: https://www.weather.gov/mfl",
+      "es": "NWS Miami: Aviso de huracán vigente para Miami-Dade. Termine sus preparativos hoy. Detalles: https://www.weather.gov/mfl",
+      "ht": "NWS Miami: Avètisman siklòn an vigè pou Miami-Dade. Fini preparasyon ou jodi a. Detay: https://www.weather.gov/mfl"
+    },
+    "clues": {
+      "en": ["The link goes to weather.gov, the real National Weather Service website.", "It's calm and tells you what to do.", "It doesn't ask for money or personal information."],
+      "es": ["El enlace lleva a weather.gov, el sitio real del Servicio Nacional de Meteorología.", "Es calmado y te dice qué hacer.", "No pide dinero ni información personal."],
+      "ht": ["Lyen an mennen sou weather.gov, vrè sit Sèvis Meteyo Nasyonal la.", "Li kalm epi li di w sa pou fè.", "Li pa mande lajan ni enfòmasyon pèsonèl."]
+    }
+  },
+  {
+    "id": "g2", "answer": "real",
+    "text": {
+      "en": "Miami-Dade County: Evacuation ordered for Zones A and B starting 10 AM. Find your zone and open shelters at https://www.miamidade.gov/hurricane",
+      "es": "Condado de Miami-Dade: Evacuación ordenada para las Zonas A y B desde las 10 AM. Busque su zona y los refugios abiertos en https://www.miamidade.gov/hurricane",
+      "ht": "Konte Miami-Dade: Lòd evakyasyon pou Zòn A ak B apati 10 AM. Chèche zòn ou ak abri ki louvri yo sou https://www.miamidade.gov/hurricane"
+    },
+    "clues": {
+      "en": ["miamidade.gov is the county's official website.", "Shelters are free, and it doesn't ask you to pay or sign up anywhere strange."],
+      "es": ["miamidade.gov es el sitio oficial del condado.", "Los refugios son gratis y no te pide pagar ni registrarte en ningún sitio raro."],
+      "ht": ["miamidade.gov se sit ofisyèl konte a.", "Abri yo gratis, epi li pa mande w peye ni enskri sou okenn sit dwòl."]
+    }
+  },
+  {
+    "id": "g3", "answer": "real",
+    "text": {
+      "en": "FEMA: Disaster aid applications are free. Apply only at https://www.disasterassistance.gov or call 1-800-621-3362.",
+      "es": "FEMA: Las solicitudes de ayuda por desastre son gratis. Solicite solo en https://www.disasterassistance.gov o llame al 1-800-621-3362.",
+      "ht": "FEMA: Demann èd pou dezas gratis. Fè demann sèlman sou https://www.disasterassistance.gov oswa rele 1-800-621-3362."
+    },
+    "clues": {
+      "en": ["DisasterAssistance.gov and 1-800-621-3362 are FEMA's real website and helpline.", "It says aid is free. Real agencies never charge you."],
+      "es": ["DisasterAssistance.gov y el 1-800-621-3362 son el sitio y la línea reales de FEMA.", "Dice que la ayuda es gratis. Las agencias reales nunca cobran."],
+      "ht": ["DisasterAssistance.gov ak 1-800-621-3362 se vrè sit ak vrè liy èd FEMA.", "Li di èd la gratis. Vrè ajans pa janm fè w peye."]
+    }
+  },
+  {
+    "id": "g4", "answer": "real",
+    "text": {
+      "en": "Florida Division of Emergency Management: State of Emergency declared for South Florida. Shelter and supply info at https://www.floridadisaster.org",
+      "es": "División de Manejo de Emergencias de Florida: Estado de emergencia declarado para el sur de Florida. Información de refugios y suministros en https://www.floridadisaster.org",
+      "ht": "Divizyon Jesyon Ijans Florid: Yo deklare Eta Ijans pou Sid Florid. Enfòmasyon sou abri ak pwovizyon sou https://www.floridadisaster.org"
+    },
+    "clues": {
+      "en": ["floridadisaster.org is the State of Florida's official emergency website.", "No pressure, no money, no personal questions."],
+      "es": ["floridadisaster.org es el sitio oficial de emergencias del Estado de Florida.", "Sin presión, sin dinero, sin preguntas personales."],
+      "ht": ["floridadisaster.org se sit ijans ofisyèl Eta Florid.", "Pa gen presyon, pa gen lajan, pa gen kesyon pèsonèl."]
+    }
+  },
+  {
+    "id": "g5", "answer": "fake",
+    "text": {
+      "en": "URGENT!!! FEMA says you qualify for $1,500. Claim in the next 10 minutes at bit.ly/fema-pay or lose it!",
+      "es": "¡¡¡URGENTE!!! FEMA dice que usted califica para $1,500. Cóbrelo en los próximos 10 minutos en bit.ly/fema-pay o lo pierde.",
+      "ht": "IJAN!!! FEMA di ou kalifye pou $1,500. Touche l nan 10 minit k ap vini yo sou bit.ly/fema-pay oswa w ap pèdi l!"
+    },
+    "clues": {
+      "en": ["bit.ly is a link shortener that hides the real website.", "It promises free money. Real aid is applied for at DisasterAssistance.gov.", "It rushes you (\"10 minutes\") and shouts with !!!"],
+      "es": ["bit.ly es un acortador que oculta el sitio real.", "Promete dinero gratis. La ayuda real se solicita en DisasterAssistance.gov.", "Te apura (\"10 minutos\") y grita con !!!"],
+      "ht": ["bit.ly se yon zouti ki kache vrè sit la.", "Li pwomèt lajan gratis. Vrè èd mande sou DisasterAssistance.gov.", "Li prese w (\"10 minit\") epi li rele ak !!!"]
+    }
+  },
+  {
+    "id": "g6", "answer": "fake",
+    "text": {
+      "en": "National Hurricane Center: Register your address at https://nhc-noaa-alerts.com to get a shelter spot.",
+      "es": "Centro Nacional de Huracanes: Registre su dirección en https://nhc-noaa-alerts.com para obtener un lugar en un refugio.",
+      "ht": "Sant Nasyonal Siklòn: Anrejistre adrès ou sou https://nhc-noaa-alerts.com pou w jwenn yon plas nan yon abri."
+    },
+    "clues": {
+      "en": ["The website is nhc-noaa-alerts.com, not a .gov site. It just copies real names.", "The Hurricane Center tracks storms. It doesn't hand out shelter spots."],
+      "es": ["El sitio es nhc-noaa-alerts.com, no un sitio .gov. Solo copia nombres reales.", "El Centro de Huracanes sigue tormentas. No reparte lugares en refugios."],
+      "ht": ["Sit la se nhc-noaa-alerts.com, se pa yon sit .gov. Li jis kopye vrè non.", "Sant Siklòn nan swiv tanpèt. Li pa bay plas nan abri."]
+    }
+  },
+  {
+    "id": "g7", "answer": "fake",
+    "text": {
+      "en": "Shelter spots are limited! Reserve your family's spot by sending a $100 Apple gift card code to this number.",
+      "es": "¡Los lugares en los refugios son limitados! Reserve el de su familia enviando el código de una tarjeta de regalo Apple de $100 a este número.",
+      "ht": "Plas nan abri yo limite! Rezève plas fanmi w lè w voye kòd yon kat kado Apple $100 nan nimewo sa a."
+    },
+    "clues": {
+      "en": ["Gift cards are a scammer's favorite. No agency takes gift cards.", "Public shelters are free.", "\"Limited spots\" is pressure to stop you from thinking."],
+      "es": ["Las tarjetas de regalo son las favoritas de los estafadores. Ninguna agencia las acepta.", "Los refugios públicos son gratis.", "\"Lugares limitados\" es presión para que no pienses."],
+      "ht": ["Kat kado se zouti pi renmen eskwo yo. Okenn ajans pa pran kat kado.", "Abri piblik yo gratis.", "\"Plas limite\" se presyon pou w pa reflechi."]
+    }
+  },
+  {
+    "id": "g8", "answer": "fake",
+    "text": {
+      "en": "BREAKING: Category 6 hurricane hitting Miami tonight. The government is hiding it. Share with everyone NOW!",
+      "es": "ÚLTIMA HORA: Huracán categoría 6 llega a Miami esta noche. El gobierno lo está escondiendo. ¡Comparte con todos YA!",
+      "ht": "DÈNYE NOUVÈL: Siklòn kategori 6 ap frape Miami aswè a. Gouvènman an ap kache l. Pataje l ak tout moun KOUNYE A!"
+    },
+    "clues": {
+      "en": ["There is no Category 6. Hurricanes only go up to 5.", "\"The government is hiding it\" is a classic fake-news line.", "It pushes you to share before checking."],
+      "es": ["No existe la categoría 6. Los huracanes llegan solo hasta 5.", "\"El gobierno lo está escondiendo\" es una frase clásica de noticias falsas.", "Te empuja a compartir antes de verificar."],
+      "ht": ["Pa gen kategori 6. Siklòn yo rive sèlman jiska 5.", "\"Gouvènman an ap kache l\" se yon vye fraz fo nouvèl.", "Li pouse w pataje anvan w verifye."]
+    }
+  },
+  {
+    "id": "g9", "answer": "fake",
+    "text": {
+      "en": "Miami-Dade Emergency: To receive your evacuation bus pass, reply with your full name, date of birth, and Social Security number.",
+      "es": "Emergencias de Miami-Dade: Para recibir su pase de autobús de evacuación, responda con su nombre completo, fecha de nacimiento y número de Seguro Social.",
+      "ht": "Ijans Miami-Dade: Pou w resevwa kat bis evakyasyon ou, reponn ak non konplè w, dat nesans ou, ak nimewo Sekirite Sosyal ou."
+    },
+    "clues": {
+      "en": ["Real agencies never ask for your Social Security number by text.", "Evacuation buses are free and don't need a \"pass\" sent by text."],
+      "es": ["Las agencias reales nunca piden tu número de Seguro Social por texto.", "Los autobuses de evacuación son gratis y no necesitan un \"pase\" por texto."],
+      "ht": ["Vrè ajans pa janm mande nimewo Sekirite Sosyal ou pa tèks.", "Bis evakyasyon gratis epi yo pa bezwen yon \"kat\" pa tèks."]
+    }
+  }
+]

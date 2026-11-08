@@ -41,6 +41,7 @@ function applyLanguage() {
   });
   renderOfficial();
   if (last && !resultBox.hidden) showResult(last.text, last.result, false);
+  if (typeof Game !== "undefined") Game.rerender(); // game open? show it in the new language
 }
 
 document.querySelectorAll(".lang-switch button").forEach((b) => {

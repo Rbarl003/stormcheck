@@ -124,5 +124,23 @@
     "expected": "suspicious",
     "source": "Fake processing fee",
     "text": "Your disaster assistance is approved. A $35 processing fee is required to release the funds. Reply YES."
+  },
+  {
+    "id": 22,
+    "expected": "suspicious",
+    "source": "Kreyòl scam: gift card",
+    "text": "Plas nan abri yo limite! Rezève plas fanmi w lè w voye kòd yon kat kado $100 nan nimewo sa a."
+  },
+  {
+    "id": 23,
+    "expected": "suspicious",
+    "source": "Kreyòl scam: Social Security number",
+    "text": "Ijans Miami-Dade: Reponn ak dat nesans ou ak nimewo Sekirite Sosyal ou pou w resevwa èd."
+  },
+  {
+    "id": 24,
+    "expected": "suspicious",
+    "source": "Kreyòl fake news: Category 6",
+    "text": "DÈNYE NOUVÈL: Siklòn kategori 6 ap frape Miami aswè a. Gouvènman an ap kache l. Pataje l ak tout moun!"
   }
 ]
