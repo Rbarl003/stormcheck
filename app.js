@@ -58,14 +58,18 @@ fetch("data/sample-alerts.json")
   .then((data) => { sampleAlerts = data; })
   .catch(() => console.warn("Could not load sample alerts"));
 
+let sampleIndex = 0;
 sampleBtn.addEventListener("click", () => {
   if (sampleAlerts.length === 0) return;
-  const pick = sampleAlerts[Math.floor(Math.random() * sampleAlerts.length)];
-  input.value = pick.text;
+  // Goes through the samples in order, so a demo is predictable
+  input.value = sampleAlerts[sampleIndex % sampleAlerts.length].text;
+  sampleIndex++;
 });
 
 // ---------- 3. Check button ----------
-checkBtn.addEventListener("click", () => {
+checkBtn.addEventListener("click", () => runCheck(false));
+
+function runCheck(shared) {
   const text = input.value.trim();
   if (!text) {
     input.focus();
@@ -78,14 +82,17 @@ checkBtn.addEventListener("click", () => {
     ? { officialAlerts: officialState.alerts, updatedText: formatTime(officialState.fetchedAt) }
     : {};
   const result = StormCheckEngine.analyze(text, context); // the real engine (engine.js)
-  last = { text, result };
+  last = { text, result, shared };
   showResult(text, result, true);
-});
+}
 
 // ---------- 4. Show a result on screen ----------
 function showResult(text, r, scroll) {
   resultBox.className = "card result " + r.label;
   resultBox.innerHTML = "";
+
+  // Opened from a neighbor's QR code / link
+  if (last && last.shared) resultBox.append(el("div", "shared-banner", t("sharedBanner")));
 
   // Label + summary + read aloud
   const top = el("div", "result-top");
@@ -136,8 +143,56 @@ function showResult(text, r, scroll) {
     });
   }
 
+  // Share with a neighbor (QR code)
+  const shareBtn = el("button", "btn-share", t("shareBtn"));
+  shareBtn.addEventListener("click", () => openShare(text));
+  resultBox.append(shareBtn);
+
   resultBox.hidden = false;
   if (scroll) resultBox.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+// ---------- 4b. Share sheet with QR code ----------
+function openShare(text) {
+  const base = location.origin + location.pathname;
+  const { url, shortened } = StormShare.makeLink(base, text);
+  const matrix = QRCodeLib.matrix(url, url.length > 900 ? "L" : "M");
+
+  const backdrop = el("div", "sheet-backdrop");
+  const sheet = el("div", "sheet");
+  sheet.setAttribute("role", "dialog");
+  sheet.setAttribute("aria-modal", "true");
+  sheet.setAttribute("aria-label", t("shareTitle"));
+
+  const qr = el("div", "qr-box");
+  qr.innerHTML = StormShare.svg(matrix); // built from numbers only, no user text inside
+
+  sheet.append(el("h2", "", t("shareTitle")), el("p", "", t("shareHelp")), qr,
+    el("p", "", t("shareSafe")), el("p", "note", t("shareOffline")));
+  if (shortened) sheet.append(el("p", "warn", t("shareShort")));
+
+  const actions = el("div", "sheet-actions");
+  const textBtn = el("button", "btn-share", t("shareSystem"));
+  textBtn.addEventListener("click", async () => {
+    // Text messages (SMS) can still go through when mobile data is down
+    if (navigator.share) {
+      try { await navigator.share({ title: "StormCheck", url }); } catch (e) { /* cancelled */ }
+    } else {
+      location.href = "sms:?&body=" + encodeURIComponent(url);
+    }
+  });
+  const closeBtn = el("button", "btn-primary", t("close"));
+  actions.append(textBtn, closeBtn);
+  sheet.append(actions);
+  backdrop.append(sheet);
+  document.body.append(backdrop);
+  closeBtn.focus();
+
+  function close() { backdrop.remove(); document.removeEventListener("keydown", onKey); }
+  function onKey(e) { if (e.key === "Escape") close(); }
+  closeBtn.addEventListener("click", close);
+  backdrop.addEventListener("click", (e) => { if (e.target === backdrop) close(); });
+  document.addEventListener("keydown", onKey);
 }
 
 // Rebuilds the pasted message with colored highlights around the flagged parts
@@ -257,7 +312,23 @@ window.addEventListener("offline", updateOnlineStatus);
 // ---------- 8. Start ----------
 applyLanguage();
 updateOnlineStatus();
-refreshOfficial();
+
+// Opened from a neighbor's QR code? The message is packed in the link.
+const sharedText = StormShare.readFromHash(location.hash);
+if (sharedText) {
+  input.value = sharedText;
+  history.replaceState(null, "", location.pathname); // clean the address bar
+}
+refreshOfficial().then(() => { if (sharedText) runCheck(true); });
+
+// Also works if StormCheck was already open when the link was opened
+window.addEventListener("hashchange", () => {
+  const text = StormShare.readFromHash(location.hash);
+  if (!text) return;
+  input.value = text;
+  history.replaceState(null, "", location.pathname);
+  runCheck(true);
+});
 
 // ---------- 9. Service worker (makes the app work offline) ----------
 if ("serviceWorker" in navigator) {

@@ -27,5 +27,16 @@ cases.forEach((c) => {
   check(c.id, c.expected, c.text, { officialAlerts, updatedText: "4:52 PM" }, c.source);
 });
 
+console.log("\n— QR share links —");
+const share = require(path.join(__dirname, "..", "share.js"));
+["Hurricane Warning for Miami-Dade. https://www.nhc.noaa.gov", "ALERTA FEMA: ayuda por el huracán ñ", "Avètisman siklòn: lanmè k ap monte"].forEach((msg, i) => {
+  total++;
+  const { url } = share.makeLink("https://stormcheck-miami.netlify.app/", msg);
+  const back = share.readFromHash(url.slice(url.indexOf("#")));
+  const ok = back === msg;
+  if (ok) passed++;
+  console.log(`${ok ? "PASS" : "FAIL"}  #Q${i + 1}  message survives the QR link round trip  (${url.length} characters)`);
+});
+
 console.log(`\n${passed}/${total} passed`);
 process.exit(passed === total ? 0 : 1);

@@ -23,18 +23,19 @@
   </div>
 
   <header class="app-header">
-    <div class="logo">🌀</div>
+    <img class="logo" src="icons/icon-192.png" alt="" width="44" height="44">
     <div class="header-text">
       <h1>StormCheck <span id="demo-badge" class="demo-badge" hidden>DEMO</span></h1>
       <p class="tagline" data-i18n="tagline">Is this hurricane alert real?</p>
     </div>
-    <!-- Language switch -->
-    <div class="lang-switch" role="group" aria-label="Language">
-      <button data-lang="en" lang="en">EN</button>
-      <button data-lang="es" lang="es">ES</button>
-      <button data-lang="ht" lang="ht">KR</button>
-    </div>
   </header>
+
+  <!-- Language switch -->
+  <nav class="lang-switch" aria-label="Language">
+    <button data-lang="en" lang="en"><svg class="flag" viewBox="0 0 22 15" aria-hidden="true"><rect width="22" height="15" fill="#fff"/><rect y="0.000" width="22" height="1.154" fill="#b22234"/><rect y="2.308" width="22" height="1.154" fill="#b22234"/><rect y="4.615" width="22" height="1.154" fill="#b22234"/><rect y="6.923" width="22" height="1.154" fill="#b22234"/><rect y="9.231" width="22" height="1.154" fill="#b22234"/><rect y="11.538" width="22" height="1.154" fill="#b22234"/><rect y="13.846" width="22" height="1.154" fill="#b22234"/><rect width="9.5" height="8.08" fill="#3c3b6e"/></svg>English</button>
+    <button data-lang="es" lang="es"><svg class="flag" viewBox="0 0 22 15" aria-hidden="true"><rect width="22" height="15" fill="#aa151b"/><rect y="3.75" width="22" height="7.5" fill="#f1bf00"/></svg>Spanish</button>
+    <button data-lang="ht" lang="ht"><svg class="flag" viewBox="0 0 22 15" aria-hidden="true"><rect width="22" height="7.5" fill="#00209f"/><rect y="7.5" width="22" height="7.5" fill="#d21034"/><rect x="8" y="5" width="6" height="5" fill="#fff"/></svg>Kreyòl</button>
+  </nav>
 
   <main class="container">
     <section class="card">
@@ -69,6 +70,8 @@
 
   <script src="engine.js"></script>
   <script src="i18n.js"></script>
+  <script src="vendor/qrcode.js"></script>
+  <script src="share.js"></script>
   <script src="official.js"></script>
   <script src="app.js"></script>
 </body>

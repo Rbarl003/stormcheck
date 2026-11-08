@@ -5,7 +5,7 @@
 // so phones download the new version.
 // ============================================================
 
-const CACHE_NAME = "stormcheck-v4";
+const CACHE_NAME = "stormcheck-v5";
 
 const APP_FILES = [
   "./",
@@ -14,6 +14,8 @@ const APP_FILES = [
   "./engine.js",
   "./i18n.js",
   "./official.js",
+  "./share.js",
+  "./vendor/qrcode.js",
   "./app.js",
   "./manifest.json",
   "./data/sample-alerts.json",
